@@ -1,0 +1,84 @@
+package com.fighting.goaltracker.domain.routine.service;
+
+import com.fighting.goaltracker.domain.routine.entity.Routine;
+import com.fighting.goaltracker.domain.routine.repository.RoutineRepository;
+import com.fighting.goaltracker.domain.user.entity.User;
+import com.fighting.goaltracker.domain.user.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.util.List;
+
+@Service
+public class RoutineService {
+
+    @Autowired
+    private RoutineRepository routineRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    // 루틴 생성
+    @Transactional
+    public Routine createRoutine(Integer userId, Routine routine) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("해당 유저를 찾을 수 없습니다."));
+
+        // 연관관계 매핑: 숫자가 아닌 유저 객체를 세팅
+        routine.setUser(user);
+        routine.setIsActive("true"); // 기본 활성화
+        return routineRepository.save(routine);
+    }
+
+    // 특정 유저의 '오늘' 해야 하는 활성화된 루틴 목록 조회
+    @Transactional(readOnly = true)
+    public List<Routine> getTodayRoutines(Integer userId) {
+        // 오늘 날짜의 요일을 3글자 대문자로 추출 (예: MONDAY -> "MON")
+        DayOfWeek dayOfWeek = LocalDate.now().getDayOfWeek();
+        String todayShort = dayOfWeek.name().substring(0, 3);
+
+        // Repository의 커스텀 쿼리 호출
+        return routineRepository.findActiveRoutinesByDay(userId, todayShort);
+    }
+
+    // 루틴 상세 조회 로직
+    public Routine getRoutineById(Integer routineId) {
+        return routineRepository.findById(routineId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 루틴이 존재하지 않습니다. ID: " + routineId));
+    }
+
+    // 루틴 수정 로직
+    @org.springframework.transaction.annotation.Transactional
+    public Routine updateRoutine(Integer routineId, Routine routineDetails) {
+        // 기존 루틴 가져오기
+        Routine routine = getRoutineById(routineId);
+
+        // 데이터 덮어씌우기 (UI 기획에 맞춘 제목 및 반복요일 수정)
+        routine.setTitle(routineDetails.getTitle());
+        routine.setRepeatDays(routineDetails.getRepeatDays());
+
+        // 만약 루틴 엔티티에 description(설명) 필드도 있다면 아래 주석을 해제하세요.
+        // routine.setDescription(routineDetails.getDescription());
+
+        return routine; // @Transactional 덕분에 함수가 끝날 때 자동으로 DB에 반영(Update)됩니다.
+    }
+
+    // 루틴 켜고 끄기 (is_active 토글 스위치)
+    @Transactional
+    public Routine toggleRoutineActive(Integer routineId) {
+        Routine routine = routineRepository.findById(routineId)
+                .orElseThrow(() -> new RuntimeException("해당 루틴을 찾을 수 없습니다."));
+
+        // "true" <-> "false" 전환
+        if ("true".equals(routine.getIsActive())) {
+            routine.setIsActive("false");
+        } else {
+            routine.setIsActive("true");
+        }
+
+        return routineRepository.save(routine);
+    }
+}

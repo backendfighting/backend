@@ -1,0 +1,67 @@
+package com.fighting.goaltracker.domain.user.service;
+
+import com.fighting.goaltracker.domain.user.entity.User;
+import com.fighting.goaltracker.domain.user.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+public class UserService {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    // 회원가입
+    @Transactional
+    public User signup(User user) {
+        // (참고) 나중에 중복 이메일 검증 로직 등을 여기에 넣으면 좋습니다!
+        return userRepository.save(user);
+    }
+
+    // 사용자 조회 (ID로 찾기)
+    @Transactional(readOnly = true)
+    public User getUserById(Integer id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+    }
+
+    // 로그인 인증
+    @Transactional(readOnly = true)
+    public User login(String email, String password) {
+        // 이메일로 사용자 찾기
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("이메일 또는 비밀번호가 일치하지 않습니다."));
+
+        // 비밀번호가 일치하는지 확인 (현재는 암호화 없이 plain text 비교)
+        if (user.getPassword().equals(password)) {
+            return user;
+        } else {
+            throw new RuntimeException("이메일 또는 비밀번호가 일치하지 않습니다.");
+        }
+    }
+
+    // 내 정보 수정
+    @Transactional
+    public User updateProfile(User updateRequest) {
+        Integer currentUserId = 1; // 임시 아이디 (추후 로그인 세션 or JWT 토큰)
+
+        User user = userRepository.findById(currentUserId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        user.setName(updateRequest.getName());
+        return userRepository.save(user);
+    }
+
+    // 비밀번호 변경
+    @Transactional
+    public void updatePassword(String newPassword) {
+        Integer currentUserId = 1; // 임시 id
+
+        User user = userRepository.findById(currentUserId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        user.setPassword(newPassword);
+        userRepository.save(user);
+    }
+}
