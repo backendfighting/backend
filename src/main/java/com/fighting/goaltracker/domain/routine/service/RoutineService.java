@@ -36,12 +36,11 @@ public class RoutineService {
     // 특정 유저의 '오늘' 해야 하는 활성화된 루틴 목록 조회
     @Transactional(readOnly = true)
     public List<Routine> getTodayRoutines(Integer userId) {
-        // 오늘 날짜의 요일을 3글자 대문자로 추출 (예: MONDAY -> "MON")
-        DayOfWeek dayOfWeek = LocalDate.now().getDayOfWeek();
-        String todayShort = dayOfWeek.name().substring(0, 3);
+        // 💡 3글자 자르기 걷어내고, 자바 표준 DayOfWeek 객체 그대로 추출 (예: DayOfWeek.MONDAY)
+        DayOfWeek today = LocalDate.now().getDayOfWeek();
 
-        // Repository의 커스텀 쿼리 호출
-        return routineRepository.findActiveRoutinesByDay(userId, todayShort);
+        // Repository의 커스텀 쿼리 호출 (Enum 객체를 그대로 넘김)
+        return routineRepository.findActiveRoutinesByDay(userId, today);
     }
 
     // 루틴 상세 조회 로직
@@ -59,9 +58,7 @@ public class RoutineService {
         // 데이터 덮어씌우기 (UI 기획에 맞춘 제목 및 반복요일 수정)
         routine.setTitle(routineDetails.getTitle());
         routine.setRepeatDays(routineDetails.getRepeatDays());
-
-        // 만약 루틴 엔티티에 description(설명) 필드도 있다면 아래 주석을 해제하세요.
-        // routine.setDescription(routineDetails.getDescription());
+        routine.setDescription(routineDetails.getDescription());
 
         return routine; // @Transactional 덕분에 함수가 끝날 때 자동으로 DB에 반영(Update)됩니다.
     }
