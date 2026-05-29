@@ -13,17 +13,17 @@ public class UserService {
     private UserRepository userRepository;
 
     // 회원가입
-@Transactional
-public User signup(User user) {
-    // 1. 중복 이메일 검증 로직
-    userRepository.findByEmail(user.getEmail())
-        .ifPresent(m -> {
-            throw new RuntimeException("이미 가입된 이메일 주소입니다.");
-        });
+    @Transactional
+    public User signup(User user) {
+        // 중복 이메일 확인
+        userRepository.findByEmail(user.getEmail())
+            .ifPresent(m -> {
+                throw new RuntimeException("이미 가입된 이메일 주소입니다.");
+            });
 
-    // 2. 중복이 없다면 정상적으로 저장
-    return userRepository.save(user);
-}
+        // 중복이 없다면 정상적으로 저장
+        return userRepository.save(user);
+    }  
 
     // 사용자 조회 (ID로 찾기)
     @Transactional(readOnly = true)
