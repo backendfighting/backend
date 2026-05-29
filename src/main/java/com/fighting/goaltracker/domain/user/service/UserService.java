@@ -13,11 +13,17 @@ public class UserService {
     private UserRepository userRepository;
 
     // 회원가입
-    @Transactional
-    public User signup(User user) {
-        // (참고) 나중에 중복 이메일 검증 로직 등을 여기에 넣으면 좋습니다!
-        return userRepository.save(user);
-    }
+@Transactional
+public User signup(User user) {
+    // 1. 중복 이메일 검증 로직
+    userRepository.findByEmail(user.getEmail())
+        .ifPresent(m -> {
+            throw new RuntimeException("이미 가입된 이메일 주소입니다.");
+        });
+
+    // 2. 중복이 없다면 정상적으로 저장
+    return userRepository.save(user);
+}
 
     // 사용자 조회 (ID로 찾기)
     @Transactional(readOnly = true)
@@ -44,7 +50,6 @@ public class UserService {
     // 내 정보 수정
     @Transactional
     public User updateProfile(User updateRequest) {
-        Integer currentUserId = 1; // 임시 아이디 (추후 로그인 세션 or JWT 토큰)
 
         User user = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
@@ -56,7 +61,6 @@ public class UserService {
     // 비밀번호 변경
     @Transactional
     public void updatePassword(String newPassword) {
-        Integer currentUserId = 1; // 임시 id
 
         User user = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
