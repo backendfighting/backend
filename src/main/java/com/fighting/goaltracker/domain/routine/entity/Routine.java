@@ -6,7 +6,12 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+<<<<<<< HEAD
 
+=======
+import java.util.List;
+import java.time.DayOfWeek;
+>>>>>>> ec72eba2ef34de6c010678ce9b199863677dcd03
 import java.time.LocalDateTime;
 
 @Entity
@@ -33,8 +38,16 @@ public class Routine {
     @Column(length = 50)
     private String category;
 
+<<<<<<< HEAD
     @Column(name = "repeat_days", length = 50)
     private String repeatDays;
+=======
+    @ElementCollection(targetClass = DayOfWeek.class, fetch = FetchType.LAZY)
+    @CollectionTable(name = "routine_repeat_days", joinColumns = @JoinColumn(name = "routine_id"))
+    @Enumerated(EnumType.STRING) // DB에 "MONDAY", "WEDNESDAY" 문자열로 안전하게 저장됨!
+    @Column(name = "day_of_week")
+    private List<DayOfWeek> repeatDays; // 중복 요일 방지를 위해 Set이나 List를 씁니다.
+>>>>>>> ec72eba2ef34de6c010678ce9b199863677dcd03
 
     @Column(name = "is_active", nullable = false)
     private String isActive = "true";
