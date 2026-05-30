@@ -44,23 +44,24 @@ public class RoutineService {
     }
 
     // 루틴 상세 조회 로직
+    @Transactional(readOnly = true)
     public Routine getRoutineById(Integer routineId) {
         return routineRepository.findById(routineId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 루틴이 존재하지 않습니다. ID: " + routineId));
     }
 
     // 루틴 수정 로직
-    @org.springframework.transaction.annotation.Transactional
+    @Transactional
     public Routine updateRoutine(Integer routineId, Routine routineDetails) {
-        // 기존 루틴 가져오기
-        Routine routine = getRoutineById(routineId);
+        Routine existingRoutine = routineRepository.findById(routineId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 루틴입니다."));
 
-        // 데이터 덮어씌우기 (UI 기획에 맞춘 제목 및 반복요일 수정)
-        routine.setTitle(routineDetails.getTitle());
-        routine.setRepeatDays(routineDetails.getRepeatDays());
-        routine.setDescription(routineDetails.getDescription());
+        existingRoutine.setTitle(routineDetails.getTitle());
+        existingRoutine.setDescription(routineDetails.getDescription());
+        existingRoutine.setCategory(routineDetails.getCategory());
+        existingRoutine.setRepeatDays(routineDetails.getRepeatDays());
 
-        return routine; // @Transactional 덕분에 함수가 끝날 때 자동으로 DB에 반영(Update)됩니다.
+        return routineRepository.save(existingRoutine);
     }
 
     // 루틴 켜고 끄기 (is_active 토글 스위치)
