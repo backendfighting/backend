@@ -11,7 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "4. 루틴 기록 (Record)", description = "날짜별 루틴 달성 여부 체크 및 기록 조회 기능")
+@Tag(name = "루틴 기록 (Record)", description = "날짜별 루틴 달성 여부 체크 및 기록 조회 기능")
 @RestController
 @RequestMapping("/api/records")
 @CrossOrigin(origins = "*", allowedHeaders = "*")

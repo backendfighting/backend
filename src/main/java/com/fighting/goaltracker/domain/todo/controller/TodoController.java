@@ -11,7 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "할 일 (Todo)", description = "투두리스트 생성, 조회, 수정, 상태 토글, 삭제 관련 API")
+@Tag(name = "할 일 (Todo)", description = "투두리스트 생성, 조회, 수정, 상태 변경, 삭제")
 @RestController
 @RequestMapping("/api/todos")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
