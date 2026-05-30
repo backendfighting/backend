@@ -17,13 +17,13 @@ public class UserService {
     public User signup(User user) {
         // 중복 이메일 확인
         userRepository.findByEmail(user.getEmail())
-            .ifPresent(m -> {
-                throw new RuntimeException("이미 가입된 이메일 주소입니다.");
-            });
+                .ifPresent(m -> {
+                    throw new RuntimeException("이미 가입된 이메일 주소입니다.");
+                });
 
         // 중복이 없다면 정상적으로 저장
         return userRepository.save(user);
-    }  
+    }
 
     // 사용자 조회 (ID로 찾기)
     @Transactional(readOnly = true)
@@ -47,9 +47,9 @@ public class UserService {
         }
     }
 
-    // 내 정보 수정
+    // 내 정보 수정 (💡 Integer currentUserId 파라미터 추가!)
     @Transactional
-    public User updateProfile(User updateRequest) {
+    public User updateProfile(Integer currentUserId, User updateRequest) {
 
         User user = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
@@ -58,9 +58,9 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    // 비밀번호 변경
+    // 비밀번호 변경 (💡 Integer currentUserId 파라미터 추가!)
     @Transactional
-    public void updatePassword(String newPassword) {
+    public void updatePassword(Integer currentUserId, String newPassword) {
 
         User user = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));

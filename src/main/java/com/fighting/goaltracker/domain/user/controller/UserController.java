@@ -37,14 +37,21 @@ public class UserController {
     // 내 정보 수정 (PATCH /api/users/me)
     @PatchMapping("/me")
     public User updateProfile(@RequestBody User updateRequest) {
-        return userService.updateProfile(updateRequest);
+        Integer currentUserId = 1;
+        return userService.updateProfile(currentUserId, updateRequest);
     }
 
     // 비밀번호 변경 (PUT /api/users/password)
     @PutMapping("/password")
     public String updatePassword(@RequestBody Map<String, String> passwordRequest) {
+        // 1. 임시로 현재 로그인한 유저의 ID를 1번으로 지정 (규격을 맞추기 위함)
+        Integer currentUserId = 1;
+
         String newPassword = passwordRequest.get("newPassword");
-        userService.updatePassword(newPassword);
+
+        // 2. 서비스에 id(Integer)와 새 비밀번호(String)를 둘 다 넘겨줍니다!
+        userService.updatePassword(currentUserId, newPassword);
+
         return "비밀번호가 성공적으로 변경되었습니다.";
     }
 }

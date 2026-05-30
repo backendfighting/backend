@@ -30,7 +30,7 @@ public class RoutineRecordService {
 
         // 해당 날짜에 이미 기록이 있는지 확인
         Optional<RoutineRecord> existingRecord = routineRecordRepository
-                .findByRoutineIdAndRecordDate(routineId, recordDate);
+                .findByRoutine_RoutineIdAndRecordDate(routineId, recordDate);
 
         if (existingRecord.isPresent()) {
             // 이미 기록이 존재한다면 -> 체크 해제 요청이므로 기록을 삭제
@@ -59,6 +59,6 @@ public class RoutineRecordService {
     @Transactional(readOnly = true)
     public List<RoutineRecord> getRecordsByDate(Integer userId, String dateStr) {
         LocalDate recordDate = LocalDate.parse(dateStr);
-        return routineRecordRepository.findByUserIdAndRecordDate(userId, recordDate);
+        return routineRecordRepository.findByUser_UserIdAndRecordDate(userId, recordDate);
     }
 }

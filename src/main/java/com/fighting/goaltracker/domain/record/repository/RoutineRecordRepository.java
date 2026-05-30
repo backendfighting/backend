@@ -12,8 +12,8 @@ import java.util.Optional;
 public interface RoutineRecordRepository extends JpaRepository<RoutineRecord, Integer> {
 
     // 특정 유저의 특정 날짜 루틴 기록 전체 조회
-    List<RoutineRecord> findByUserIdAndRecordDate(Integer userId, LocalDate recordDate);
+    List<RoutineRecord> findByUser_UserIdAndRecordDate(Integer userId, LocalDate recordDate);
 
     // 특정 루틴이 특정 날짜에 이미 체크되었는지 확인하기 위한 용도
-    Optional<RoutineRecord> findByRoutineIdAndRecordDate(Integer routineId, LocalDate recordDate);
+    Optional<RoutineRecord> findByRoutine_RoutineIdAndRecordDate(Integer routineId, LocalDate recordDate);
 }
