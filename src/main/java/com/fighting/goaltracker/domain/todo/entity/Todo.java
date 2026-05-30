@@ -8,7 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
-import java.time.LocalTime; // 1. 마감 시간용 타입 임포트
+import java.time.LocalTime;
 import java.time.LocalDateTime;
 
 @Entity

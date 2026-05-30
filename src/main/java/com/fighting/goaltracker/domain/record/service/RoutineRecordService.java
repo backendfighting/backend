@@ -57,8 +57,7 @@ public class RoutineRecordService {
 
     // 2. 특정 날짜의 루틴 달성 기록 목록 조회 (달력이나 일별 화면용)
     @Transactional(readOnly = true)
-    public List<RoutineRecord> getRecordsByDate(Integer userId, String dateStr) {
-        LocalDate recordDate = LocalDate.parse(dateStr);
-        return routineRecordRepository.findByUser_UserIdAndRecordDate(userId, recordDate);
+    public List<RoutineRecord> getRecordsByDate(Integer userId, LocalDate date) {
+        return routineRecordRepository.findByUser_UserIdAndRecordDate(userId, date);
     }
 }
