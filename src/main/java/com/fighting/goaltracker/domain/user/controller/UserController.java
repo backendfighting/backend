@@ -2,17 +2,11 @@ package com.fighting.goaltracker.domain.user.controller;
 
 import com.fighting.goaltracker.domain.user.entity.User;
 import com.fighting.goaltracker.domain.user.service.UserService;
-
-import io.swagger.v3.oas.annotations.Operation;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.Map;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "사용자(User)", description = "회원가입, 로그인, 정보 조회 및 수정")
 @RestController

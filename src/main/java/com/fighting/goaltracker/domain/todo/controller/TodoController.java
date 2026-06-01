@@ -5,11 +5,8 @@ import com.fighting.goaltracker.domain.todo.service.TodoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "할 일 (Todo)", description = "투두리스트 생성, 조회, 수정, 상태 변경, 삭제")
 @RestController
@@ -30,8 +27,10 @@ public class TodoController {
     // 날짜별 투두 조회 (GET /api/todos?date=2026-05-07)
     @Operation(summary = "날짜별 투두 조회", description = "쿼리 파라미터로 전달된 특정 날짜의 투두리스트를 모두 조회")
     @GetMapping
-    public List<Todo> getTodosByDate(@RequestParam("date") String date) {
-        return todoService.getTodosByDate(date);
+    public List<Todo> getTodosByDate(
+            @RequestParam("userId") Integer userId,
+            @RequestParam("date") String date) {
+        return todoService.getTodosByDate(userId, date);
     }
 
     // 투두 완료 상태 변경 (PATCH /api/todos/1/complete)
