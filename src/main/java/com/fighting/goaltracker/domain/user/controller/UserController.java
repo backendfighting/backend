@@ -68,9 +68,10 @@ public class UserController {
     @Operation(summary = "비밀번호 변경", description = "현재 로그인한 유저의 비밀번호 변경 (현재는 1번 유저로 고정)")
     @PutMapping("/password")
     public String updatePassword(@RequestBody Map<String, String> passwordRequest, HttpSession session) {
-        Integer currentUserId = (Integer) session.getAttribute("userId"); // 세션에서 userId 꺼내기
+        Integer currentUserId = (Integer) session.getAttribute("userId");
+        String currentPassword = passwordRequest.get("currentPassword");
         String newPassword = passwordRequest.get("newPassword");
-        userService.updatePassword(currentUserId, newPassword);
+        userService.updatePassword(currentUserId, currentPassword, newPassword);
         return "비밀번호가 성공적으로 변경되었습니다.";
     }
 }

@@ -47,23 +47,43 @@ public class UserService {
         }
     }
 
-    // 내 정보 수정 (💡 Integer currentUserId 파라미터 추가!)
+    // 내 정보 수정
     @Transactional
     public User updateProfile(Integer currentUserId, User updateRequest) {
-
         User user = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-        user.setName(updateRequest.getName());
+        // 이름이 빈 문자열로 들어오면 에러
+        if (updateRequest.getName() != null && updateRequest.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("이름은 비워둘 수 없습니다.");
+        }
+
+        // 이메일이 빈 문자열로 들어오면 에러
+        if (updateRequest.getEmail() != null && updateRequest.getEmail().trim().isEmpty()) {
+            throw new IllegalArgumentException("이메일은 비워둘 수 없습니다.");
+        }
+
+        // 값이 있을 때만 변경
+        if (updateRequest.getName() != null) {
+            user.setName(updateRequest.getName());
+        }
+        if (updateRequest.getEmail() != null) {
+            user.setEmail(updateRequest.getEmail());
+        }
+
         return userRepository.save(user);
     }
 
-    // 비밀번호 변경 (💡 Integer currentUserId 파라미터 추가!)
+    // 비밀번호 변경
     @Transactional
-    public void updatePassword(Integer currentUserId, String newPassword) {
-
+    public void updatePassword(Integer currentUserId, String currentPassword, String newPassword) {
         User user = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        // 현재 비밀번호 확인
+        if (!user.getPassword().equals(currentPassword)) {
+            throw new IllegalArgumentException("현재 비밀번호가 일치하지 않습니다.");
+        }
 
         user.setPassword(newPassword);
         userRepository.save(user);
