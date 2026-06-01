@@ -30,7 +30,7 @@ public class TodoService {
     @Transactional
     public Todo toggleComplete(Integer id) {
         Todo todo = todoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("해당 투두를 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("해당 투두를 찾을 수 없습니다."));
 
         // 현재 상태 반전시키기
         todo.setCompleted(!todo.isCompleted());
@@ -41,7 +41,7 @@ public class TodoService {
     @Transactional
     public Todo updateTodo(Integer id, Todo todoDetails) {
         Todo todo = todoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("해당 투두를 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("해당 투두를 찾을 수 없습니다."));
 
         // 제목, 내용, 날짜 정보 수정
         todo.setTitle(todoDetails.getTitle());
@@ -55,7 +55,7 @@ public class TodoService {
     @Transactional
     public void deleteTodo(Integer id) {
         Todo todo = todoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("해당 투두를 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("해당 투두를 찾을 수 없습니다."));
 
         todoRepository.delete(todo);
     }

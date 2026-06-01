@@ -25,7 +25,7 @@ public class RoutineService {
     @Transactional
     public Routine createRoutine(Integer userId, Routine routine) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("해당 유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
 
         routine.setUser(user);
         routine.setActive(true);
@@ -66,7 +66,7 @@ public class RoutineService {
     @Transactional
     public Routine toggleRoutineActive(Integer routineId) {
         Routine routine = routineRepository.findById(routineId)
-                .orElseThrow(() -> new RuntimeException("해당 루틴을 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("해당 루틴을 찾을 수 없습니다."));
 
         // "true" <-> "false" 전환
         routine.setActive(!routine.isActive());

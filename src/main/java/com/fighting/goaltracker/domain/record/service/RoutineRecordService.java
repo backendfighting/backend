@@ -39,7 +39,7 @@ public class RoutineRecordService {
         } else {
             // 기록이 없다면 -> 새롭게 완료 처리
             Routine routine = routineRepository.findById(routineId)
-                    .orElseThrow(() -> new RuntimeException("해당 루틴을 찾을 수 없습니다."));
+                    .orElseThrow(() -> new IllegalArgumentException("해당 루틴을 찾을 수 없습니다."));
 
             User user = routine.getUser(); // 루틴에 묶여있는 유저 객체 가져오기
 

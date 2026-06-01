@@ -18,7 +18,7 @@ public class UserService {
         // 중복 이메일 확인
         userRepository.findByEmail(user.getEmail())
                 .ifPresent(m -> {
-                    throw new RuntimeException("이미 가입된 이메일 주소입니다.");
+                    throw new IllegalArgumentException("이미 가입된 이메일 주소입니다.");
                 });
 
         // 중복이 없다면 정상적으로 저장
@@ -29,7 +29,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public User getUserById(Integer id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
     }
 
     // 로그인 인증
@@ -37,13 +37,13 @@ public class UserService {
     public User login(String email, String password) {
         // 이메일로 사용자 찾기
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("이메일 또는 비밀번호가 일치하지 않습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("이메일 또는 비밀번호가 일치하지 않습니다."));
 
         // 비밀번호가 일치하는지 확인 (현재는 암호화 없이 plain text 비교)
         if (user.getPassword().equals(password)) {
             return user;
         } else {
-            throw new RuntimeException("이메일 또는 비밀번호가 일치하지 않습니다.");
+            throw new IllegalArgumentException("이메일 또는 비밀번호가 일치하지 않습니다.");
         }
     }
 
@@ -52,7 +52,7 @@ public class UserService {
     public User updateProfile(Integer currentUserId, User updateRequest) {
 
         User user = userRepository.findById(currentUserId)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         user.setName(updateRequest.getName());
         return userRepository.save(user);
@@ -63,7 +63,7 @@ public class UserService {
     public void updatePassword(Integer currentUserId, String newPassword) {
 
         User user = userRepository.findById(currentUserId)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         user.setPassword(newPassword);
         userRepository.save(user);

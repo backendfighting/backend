@@ -1,5 +1,8 @@
 package com.fighting.goaltracker.domain.user.controller;
 
+import com.fighting.goaltracker.domain.user.dto.LoginRequestDto;
+import com.fighting.goaltracker.domain.user.dto.SignupRequestDto;
+
 import com.fighting.goaltracker.domain.user.entity.User;
 import com.fighting.goaltracker.domain.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +24,11 @@ public class UserController {
     // 회원가입 (POST /api/users/signup)
     @Operation(summary = "회원가입", description = "새로운 유저 정보를 받아 회원가입 진행")
     @PostMapping("/signup")
-    public User signup(@RequestBody User user) {
+    public User signup(@RequestBody SignupRequestDto request) {
+        User user = new User();
+        user.setName(request.getName());
+        user.setEmail(request.getEmail());
+        user.setPassword(request.getPassword());
         return userService.signup(user);
     }
 
@@ -35,9 +42,9 @@ public class UserController {
     // 로그인 (POST /api/users/login)
     @Operation(summary = "로그인", description = "이메일과 비밀번호를 검증하여 로그인")
     @PostMapping("/login")
-    public User login(@RequestBody User loginRequest, HttpSession session) {
-        User user = userService.login(loginRequest.getEmail(), loginRequest.getPassword());
-        session.setAttribute("userId", user.getUserId()); // 로그인 성공시 세션에 userId 저장
+    public User login(@RequestBody LoginRequestDto request, HttpSession session) {
+        User user = userService.login(request.getEmail(), request.getPassword());
+        session.setAttribute("userId", user.getUserId());
         return user;
     }
 
