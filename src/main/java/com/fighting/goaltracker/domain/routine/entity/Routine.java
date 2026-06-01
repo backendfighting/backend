@@ -41,7 +41,7 @@ public class Routine {
     private List<DayOfWeek> repeatDays; // 중복 요일 방지를 위해 Set이나 List를 씁니다.
 
     @Column(name = "is_active", nullable = false)
-    private String isActive = "true";
+    private boolean isActive = true;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

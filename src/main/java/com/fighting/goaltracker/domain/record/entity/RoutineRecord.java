@@ -33,8 +33,7 @@ public class RoutineRecord {
     private LocalDate recordDate;
 
     @Column(name = "is_completed", nullable = false)
-    private String isCompleted = "false";
-
+    private boolean isCompleted = false;
     @Column(name = "completed_at")
     private LocalDateTime completedAt;
 

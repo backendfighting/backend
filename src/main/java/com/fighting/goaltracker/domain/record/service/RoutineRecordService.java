@@ -47,7 +47,7 @@ public class RoutineRecordService {
             record.setRoutine(routine);
             record.setUser(user);
             record.setRecordDate(recordDate);
-            record.setIsCompleted("true");
+            record.setCompleted(true);
             record.setCompletedAt(LocalDateTime.now()); // 현재 완수 시각 저장
 
             routineRecordRepository.save(record);

@@ -27,16 +27,14 @@ public class RoutineService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("해당 유저를 찾을 수 없습니다."));
 
-        // 연관관계 매핑: 숫자가 아닌 유저 객체를 세팅
         routine.setUser(user);
-        routine.setIsActive("true"); // 기본 활성화
+        routine.setIsActive("true");
         return routineRepository.save(routine);
     }
 
     // 특정 유저의 '오늘' 해야 하는 활성화된 루틴 목록 조회
     @Transactional(readOnly = true)
     public List<Routine> getTodayRoutines(Integer userId) {
-        // 💡 3글자 자르기 걷어내고, 자바 표준 DayOfWeek 객체 그대로 추출 (예: DayOfWeek.MONDAY)
         DayOfWeek today = LocalDate.now().getDayOfWeek();
 
         // Repository의 커스텀 쿼리 호출 (Enum 객체를 그대로 넘김)
@@ -71,11 +69,7 @@ public class RoutineService {
                 .orElseThrow(() -> new RuntimeException("해당 루틴을 찾을 수 없습니다."));
 
         // "true" <-> "false" 전환
-        if ("true".equals(routine.getIsActive())) {
-            routine.setIsActive("false");
-        } else {
-            routine.setIsActive("true");
-        }
+        routine.setActive(!routine.isActive());
 
         return routineRepository.save(routine);
     }
