@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpSession;
 
 @Tag(name = "사용자(User)", description = "회원가입, 로그인, 정보 조회 및 수정")
 @RestController
@@ -34,31 +35,35 @@ public class UserController {
     // 로그인 (POST /api/users/login)
     @Operation(summary = "로그인", description = "이메일과 비밀번호를 검증하여 로그인")
     @PostMapping("/login")
-    public User login(@RequestBody User loginRequest) {
-        // Service에 이메일과 비밀번호를 넘겨서 인증 결과를 받음
-        return userService.login(loginRequest.getEmail(), loginRequest.getPassword());
+    public User login(@RequestBody User loginRequest, HttpSession session) {
+        User user = userService.login(loginRequest.getEmail(), loginRequest.getPassword());
+        session.setAttribute("userId", user.getUserId()); // 로그인 성공시 세션에 userId 저장
+        return user;
+    }
+
+    // 로그아웃 (POST /api/users/logout)
+    @Operation(summary = "로그아웃", description = "현재 로그인한 유저의 세션을 삭제하여 로그아웃 처리")
+    @PostMapping("/logout")
+    public String logout(HttpSession session) {
+        session.invalidate(); // 세션 전체 삭제
+        return "로그아웃 되었습니다.";
     }
 
     // 내 정보 수정 (PATCH /api/users/me)
     @Operation(summary = "내 정보 수정", description = "현재 로그인한 유저의 프로필 정보 수정 (현재는 1번 유저로 고정)")
     @PatchMapping("/me")
-    public User updateProfile(@RequestBody User updateRequest) {
-        Integer currentUserId = 1;
+    public User updateProfile(@RequestBody User updateRequest, HttpSession session) {
+        Integer currentUserId = (Integer) session.getAttribute("userId"); // 세션에서 userId 꺼내기
         return userService.updateProfile(currentUserId, updateRequest);
     }
 
     // 비밀번호 변경 (PUT /api/users/password)
     @Operation(summary = "비밀번호 변경", description = "현재 로그인한 유저의 비밀번호 변경 (현재는 1번 유저로 고정)")
     @PutMapping("/password")
-    public String updatePassword(@RequestBody Map<String, String> passwordRequest) {
-        // 임시 아이디 1로 지정
-        Integer currentUserId = 1;
-
+    public String updatePassword(@RequestBody Map<String, String> passwordRequest, HttpSession session) {
+        Integer currentUserId = (Integer) session.getAttribute("userId"); // 세션에서 userId 꺼내기
         String newPassword = passwordRequest.get("newPassword");
-
-        // 서비스에 id와 새 비밀번호 둘 다 넘겨줌
         userService.updatePassword(currentUserId, newPassword);
-
         return "비밀번호가 성공적으로 변경되었습니다.";
     }
 }

@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface TodoRepository extends JpaRepository<Todo, Integer> {
-    List<Todo> findByTodoDate(LocalDate todoDate);
+    List<Todo> findByUser_UserIdAndTodoDate(Integer userId, LocalDate todoDate);
 }

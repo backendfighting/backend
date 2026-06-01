@@ -28,7 +28,7 @@ public class RoutineService {
                 .orElseThrow(() -> new RuntimeException("해당 유저를 찾을 수 없습니다."));
 
         routine.setUser(user);
-        routine.setIsActive("true");
+        routine.setActive(true);
         return routineRepository.save(routine);
     }
 

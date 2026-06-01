@@ -5,7 +5,6 @@ import com.fighting.goaltracker.domain.todo.repository.TodoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDate;
 import java.util.List;
 
@@ -22,10 +21,9 @@ public class TodoService {
     }
 
     // 날짜별 투두 조회
-    @Transactional(readOnly = true)
-    public List<Todo> getTodosByDate(String dateStr) {
+    public List<Todo> getTodosByDate(Integer userId, String dateStr) {
         LocalDate localDate = LocalDate.parse(dateStr);
-        return todoRepository.findByTodoDate(localDate);
+        return todoRepository.findByUser_UserIdAndTodoDate(userId, localDate);
     }
 
     // 투두 완료 상태 변경 (토글)
