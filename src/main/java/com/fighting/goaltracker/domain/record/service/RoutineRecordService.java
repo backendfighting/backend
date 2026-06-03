@@ -35,11 +35,15 @@ public class RoutineRecordService {
         if (existingRecord.isPresent()) {
             // 이미 기록이 존재한다면 -> 체크 해제 요청이므로 기록을 삭제
             routineRecordRepository.delete(existingRecord.get());
-            return "체크 해제 완료 (기록 삭제)";
+            return "수행 취소"; // 테스트용 출력(추후 삭제)
         } else {
             // 기록이 없다면 -> 새롭게 완료 처리
             Routine routine = routineRepository.findById(routineId)
                     .orElseThrow(() -> new IllegalArgumentException("해당 루틴을 찾을 수 없습니다."));
+
+            if (!routine.getUser().getUserId().equals(userId)) {
+                throw new IllegalArgumentException("본인의 루틴만 체크할 수 있습니다.");
+            }
 
             User user = routine.getUser(); // 루틴에 묶여있는 유저 객체 가져오기
 
@@ -51,7 +55,7 @@ public class RoutineRecordService {
             record.setCompletedAt(LocalDateTime.now()); // 현재 완수 시각 저장
 
             routineRecordRepository.save(record);
-            return "체크 완료 (기록 생성)";
+            return "수행 완료"; // 테스트용 출력(추후 삭제)
         }
     }
 
