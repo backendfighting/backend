@@ -17,6 +17,24 @@ public class TodoService {
     // 투두 생성
     @Transactional
     public Todo createTodo(Todo todo) {
+        Integer userId = todo.getUser().getUserId();
+
+        // 제목 + 날짜 + 시간이 같은 투두 확인
+        if (todo.getTodoTime() != null) {
+            // 제목 + 날짜 + 시간이 같은 투두 확인
+            List<Todo> sameTitle = todoRepository.findByUser_UserIdAndTitleAndTodoDateAndTodoTime(
+                    userId, todo.getTitle(), todo.getTodoDate(), todo.getTodoTime());
+            if (!sameTitle.isEmpty()) {
+                throw new IllegalArgumentException("이미 같은 일정이 존재합니다.");
+            }
+
+            // 날짜 + 시간이 같은 투두 확인
+            List<Todo> sameTime = todoRepository.findByUser_UserIdAndTodoDateAndTodoTime(
+                    userId, todo.getTodoDate(), todo.getTodoTime());
+            if (!sameTime.isEmpty()) {
+                throw new IllegalArgumentException("동일한 시간에 일정이 존재합니다.");
+            }
+        }
         return todoRepository.save(todo);
     }
 

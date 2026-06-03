@@ -41,10 +41,6 @@ public class RoutineRecordService {
             Routine routine = routineRepository.findById(routineId)
                     .orElseThrow(() -> new IllegalArgumentException("해당 루틴을 찾을 수 없습니다."));
 
-            if (!routine.getUser().getUserId().equals(userId)) {
-                throw new IllegalArgumentException("본인의 루틴만 체크할 수 있습니다.");
-            }
-
             User user = routine.getUser(); // 루틴에 묶여있는 유저 객체 가져오기
 
             RoutineRecord record = new RoutineRecord();

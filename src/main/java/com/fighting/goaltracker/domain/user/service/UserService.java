@@ -53,16 +53,6 @@ public class UserService {
         User user = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-        // 이름이 빈 문자열로 들어오면 에러
-        if (updateRequest.getName() != null && updateRequest.getName().trim().isEmpty()) {
-            throw new IllegalArgumentException("이름은 비워둘 수 없습니다.");
-        }
-
-        // 이메일이 빈 문자열로 들어오면 에러
-        if (updateRequest.getEmail() != null && updateRequest.getEmail().trim().isEmpty()) {
-            throw new IllegalArgumentException("이메일은 비워둘 수 없습니다.");
-        }
-
         // 값이 있을 때만 변경
         if (updateRequest.getName() != null) {
             user.setName(updateRequest.getName());

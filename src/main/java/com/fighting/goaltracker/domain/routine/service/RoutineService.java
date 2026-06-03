@@ -27,24 +27,10 @@ public class RoutineService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
 
-        // title 검사
-        if (routine.getTitle() == null || routine.getTitle().trim().isEmpty()) {
-            throw new IllegalArgumentException("루틴 제목은 비워둘 수 없습니다.");
-        }
-
-        // category 검사
-        if (routine.getCategory() == null || routine.getCategory().trim().isEmpty()) {
-            throw new IllegalArgumentException("카테고리를 선택해 주세요.");
-        }
-        // 체크박스 형식으로 구현할 시 다시 고려
+        // 카테고리 드롭다운에 넣을 리스트
         List<String> validCategories = List.of("공부", "취미", "건강", "기타");
         if (!validCategories.contains(routine.getCategory())) {
             throw new IllegalArgumentException("유효하지 않은 카테고리입니다.");
-        }
-
-        // repeatDays 검사
-        if (routine.getRepeatDays() == null || routine.getRepeatDays().isEmpty()) {
-            throw new IllegalArgumentException("반복 요일을 선택해 주세요.");
         }
 
         // 중복 루틴 검사
@@ -80,10 +66,7 @@ public class RoutineService {
         Routine existingRoutine = routineRepository.findById(routineId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 루틴입니다."));
 
-        // title: 빈 문자열이면 에러, 값이 있으면 변경, null이면 기존 값 유지
-        if (routineDetails.getTitle() != null && routineDetails.getTitle().trim().isEmpty()) {
-            throw new IllegalArgumentException("루틴 제목은 비워둘 수 없습니다.");
-        }
+        // title: 값이 있으면 변경, null이면 기존 값 유지
         if (routineDetails.getTitle() != null) {
             existingRoutine.setTitle(routineDetails.getTitle());
         }
@@ -93,10 +76,7 @@ public class RoutineService {
             existingRoutine.setDescription(routineDetails.getDescription());
         }
 
-        // category: 빈 문자열이면 에러, 값이 있으면 유효한 카테고리인지 확인 후 변경
-        if (routineDetails.getCategory() != null && routineDetails.getCategory().trim().isEmpty()) {
-            throw new IllegalArgumentException("카테고리를 선택해 주세요.");
-        }
+        // category: 값이 있으면 유효한 카테고리인지 확인 후 변경
         if (routineDetails.getCategory() != null) {
             List<String> validCategories = List.of("공부", "취미", "건강", "기타");
             if (!validCategories.contains(routineDetails.getCategory())) {
@@ -105,10 +85,7 @@ public class RoutineService {
             existingRoutine.setCategory(routineDetails.getCategory());
         }
 
-        // repeatDays: 빈 리스트이면 에러, 값이 있으면 변경
-        if (routineDetails.getRepeatDays() != null && routineDetails.getRepeatDays().isEmpty()) {
-            throw new IllegalArgumentException("반복 요일을 선택해 주세요.");
-        }
+        // repeatDays: 값이 있으면 변경
         if (routineDetails.getRepeatDays() != null) {
             existingRoutine.setRepeatDays(routineDetails.getRepeatDays());
         }
