@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -34,10 +33,8 @@ public class RoutineRecord {
 
     @Column(name = "is_completed", nullable = false)
     private boolean isCompleted = false;
+
     @Column(name = "completed_at")
     private LocalDateTime completedAt;
 
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
 }
