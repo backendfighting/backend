@@ -53,10 +53,12 @@ public class TodoService {
 
     // 투두 삭제
     @Transactional
-    public void deleteTodo(Integer id) {
+    public String deleteTodo(Integer id) {
         Todo todo = todoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 투두를 찾을 수 없습니다."));
 
+        String title = todo.getTitle(); // 삭제 전에 제목 저장
         todoRepository.delete(todo);
+        return title; // 제목 반환 (service에서 삭제 안내 문구 출력 위해서)
     }
 }
