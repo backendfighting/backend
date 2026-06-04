@@ -61,10 +61,15 @@ public class TodoService {
         Todo todo = todoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 투두를 찾을 수 없습니다."));
 
-        // 제목, 내용, 날짜 정보 수정
-        todo.setTitle(todoDetails.getTitle());
-        todo.setDescription(todoDetails.getDescription());
-        todo.setTodoDate(todoDetails.getTodoDate());
+        if (todoDetails.getTitle() != null) {
+            todo.setTitle(todoDetails.getTitle());
+        }
+        if (todoDetails.getDescription() != null) {
+            todo.setDescription(todoDetails.getDescription());
+        }
+        if (todoDetails.getTodoDate() != null) {
+            todo.setTodoDate(todoDetails.getTodoDate());
+        }
 
         return todoRepository.save(todo);
     }

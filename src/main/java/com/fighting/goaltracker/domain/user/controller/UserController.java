@@ -57,7 +57,7 @@ public class UserController {
     }
 
     // 내 정보 수정 (PATCH /api/users/me)
-    @Operation(summary = "내 정보 수정", description = "현재 로그인한 유저의 프로필 정보 수정 (현재는 1번 유저로 고정)")
+    @Operation(summary = "내 정보 수정", description = "현재 로그인한 유저의 프로필 정보 수정")
     @PatchMapping("/me")
     public User updateProfile(@RequestBody User updateRequest, HttpSession session) {
         Integer currentUserId = (Integer) session.getAttribute("userId"); // 세션에서 userId 꺼내기
@@ -65,7 +65,7 @@ public class UserController {
     }
 
     // 비밀번호 변경 (PUT /api/users/password)
-    @Operation(summary = "비밀번호 변경", description = "현재 로그인한 유저의 비밀번호 변경 (현재는 1번 유저로 고정)")
+    @Operation(summary = "비밀번호 변경", description = "현재 로그인한 유저의 비밀번호 변경")
     @PutMapping("/password")
     public String updatePassword(@RequestBody Map<String, String> passwordRequest, HttpSession session) {
         Integer currentUserId = (Integer) session.getAttribute("userId");
