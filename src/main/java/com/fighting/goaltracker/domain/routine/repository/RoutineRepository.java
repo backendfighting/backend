@@ -13,7 +13,7 @@ import java.util.List;
 public interface RoutineRepository extends JpaRepository<Routine, Integer> {
 
     // 특정 유저의 모든 루틴 조회
-    List<Routine> findByUserId(Integer userId);
+    List<Routine> findByUserUserId(Integer userId);
 
     // 💡 1:N 컬렉션 테이블(routine_repeat_days)에서 오늘 요일(DayOfWeek)과 일치하고 활성화된 루틴 조회
     @Query("SELECT r FROM Routine r JOIN r.repeatDays d WHERE r.user.id = :userId AND r.isActive = 'true' AND d = :dayOfWeek")
