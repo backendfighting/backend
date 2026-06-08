@@ -25,18 +25,28 @@ public class RoutineService {
     @Transactional
     public Routine createRoutine(Integer userId, Routine routine) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("해당 유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
 
-        // 연관관계 매핑: 숫자가 아닌 유저 객체를 세팅
+        // 카테고리 드롭다운에 넣을 리스트
+        List<String> validCategories = List.of("공부", "취미", "건강", "기타");
+        if (!validCategories.contains(routine.getCategory())) {
+            throw new IllegalArgumentException("유효하지 않은 카테고리입니다.");
+        }
+
+        // 중복 루틴 검사
+        List<Routine> existing = routineRepository.findByUser_UserIdAndTitle(userId, routine.getTitle());
+        if (!existing.isEmpty()) {
+            throw new IllegalArgumentException("이미 존재하는 루틴입니다.");
+        }
+
         routine.setUser(user);
-        routine.setIsActive("true"); // 기본 활성화
+        routine.setActive(true);
         return routineRepository.save(routine);
     }
 
     // 특정 유저의 '오늘' 해야 하는 활성화된 루틴 목록 조회
     @Transactional(readOnly = true)
     public List<Routine> getTodayRoutines(Integer userId) {
-        // 💡 3글자 자르기 걷어내고, 자바 표준 DayOfWeek 객체 그대로 추출 (예: DayOfWeek.MONDAY)
         DayOfWeek today = LocalDate.now().getDayOfWeek();
 
         // Repository의 커스텀 쿼리 호출 (Enum 객체를 그대로 넘김)
@@ -44,37 +54,53 @@ public class RoutineService {
     }
 
     // 루틴 상세 조회 로직
+    @Transactional(readOnly = true)
     public Routine getRoutineById(Integer routineId) {
         return routineRepository.findById(routineId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 루틴이 존재하지 않습니다. ID: " + routineId));
     }
 
     // 루틴 수정 로직
-    @org.springframework.transaction.annotation.Transactional
+    @Transactional
     public Routine updateRoutine(Integer routineId, Routine routineDetails) {
-        // 기존 루틴 가져오기
-        Routine routine = getRoutineById(routineId);
+        Routine existingRoutine = routineRepository.findById(routineId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 루틴입니다."));
 
-        // 데이터 덮어씌우기 (UI 기획에 맞춘 제목 및 반복요일 수정)
-        routine.setTitle(routineDetails.getTitle());
-        routine.setRepeatDays(routineDetails.getRepeatDays());
-        routine.setDescription(routineDetails.getDescription());
+        // title: 값이 있으면 변경, null이면 기존 값 유지
+        if (routineDetails.getTitle() != null) {
+            existingRoutine.setTitle(routineDetails.getTitle());
+        }
 
-        return routine; // @Transactional 덕분에 함수가 끝날 때 자동으로 DB에 반영(Update)됩니다.
+        // description: 값이 있을 때만 변경 (비워도 됨)
+        if (routineDetails.getDescription() != null) {
+            existingRoutine.setDescription(routineDetails.getDescription());
+        }
+
+        // category: 값이 있으면 유효한 카테고리인지 확인 후 변경
+        if (routineDetails.getCategory() != null) {
+            List<String> validCategories = List.of("공부", "취미", "건강", "기타");
+            if (!validCategories.contains(routineDetails.getCategory())) {
+                throw new IllegalArgumentException("유효하지 않은 카테고리입니다.");
+            }
+            existingRoutine.setCategory(routineDetails.getCategory());
+        }
+
+        // repeatDays: 값이 있으면 변경
+        if (routineDetails.getRepeatDays() != null) {
+            existingRoutine.setRepeatDays(routineDetails.getRepeatDays());
+        }
+
+        return routineRepository.save(existingRoutine);
     }
 
     // 루틴 켜고 끄기 (is_active 토글 스위치)
     @Transactional
     public Routine toggleRoutineActive(Integer routineId) {
         Routine routine = routineRepository.findById(routineId)
-                .orElseThrow(() -> new RuntimeException("해당 루틴을 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("해당 루틴을 찾을 수 없습니다."));
 
         // "true" <-> "false" 전환
-        if ("true".equals(routine.getIsActive())) {
-            routine.setIsActive("false");
-        } else {
-            routine.setIsActive("true");
-        }
+        routine.setActive(!routine.isActive());
 
         return routineRepository.save(routine);
     }
