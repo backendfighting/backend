@@ -2,8 +2,7 @@ package com.fighting.goaltracker.domain.todo.entity;
 
 import com.fighting.goaltracker.domain.user.entity.User;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -14,7 +13,9 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "todos")
 @Getter
-@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
 public class Todo {
 
     @Id
@@ -51,4 +52,17 @@ public class Todo {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    public void toggleComplete() {
+        this.isCompleted = !this.isCompleted;
+    }
+
+    public void update(String title, String description, LocalDate todoDate,
+                       LocalTime todoTime, String priority) {
+        if (title != null) this.title = title;
+        if (description != null) this.description = description;
+        if (todoDate != null) this.todoDate = todoDate;
+        if (todoTime != null) this.todoTime = todoTime;
+        if (priority != null) this.priority = priority;
+    }
 }

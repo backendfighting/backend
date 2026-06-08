@@ -2,13 +2,12 @@ package com.fighting.goaltracker.domain.todo.controller;
 
 import com.fighting.goaltracker.domain.todo.dto.TodoRequestDto;
 import com.fighting.goaltracker.domain.todo.dto.TodoResponseDto;
-import com.fighting.goaltracker.domain.todo.entity.Todo;
 import com.fighting.goaltracker.domain.todo.service.TodoService;
-import com.fighting.goaltracker.domain.user.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
@@ -30,33 +29,19 @@ public class TodoController {
         if (userId == null)
             throw new IllegalArgumentException("로그인이 필요합니다.");
 
-        User user = new User();
-        user.setUserId(userId);
-
-        Todo todo = new Todo();
-        todo.setUser(user);
-        todo.setTitle(request.getTitle());
-        todo.setDescription(request.getDescription());
-        todo.setTodoDate(request.getTodoDate());
-        todo.setTodoTime(request.getTodoTime());
-        todo.setPriority(request.getPriority());
-
-        return new TodoResponseDto(todoService.createTodo(todo));
+        return todoService.createTodo(userId, request);
     }
 
     // 날짜별 투두 조회
     @Operation(summary = "날짜별 투두 조회", description = "쿼리 파라미터로 전달된 특정 날짜의 투두리스트를 모두 조회")
     @GetMapping
     public List<TodoResponseDto> getTodosByDate(
-            @RequestParam("date") String date,
+            @RequestParam("date") LocalDate date,
             HttpSession session) {
         Integer userId = (Integer) session.getAttribute("userId");
         if (userId == null)
             throw new IllegalArgumentException("로그인이 필요합니다.");
-        return todoService.getTodosByDate(userId, date)
-                .stream()
-                .map(TodoResponseDto::new)
-                .collect(Collectors.toList());
+        return todoService.getTodosByDate(userId, date);
     }
 
     // 투두 완료 상태 변경
@@ -66,7 +51,7 @@ public class TodoController {
         Integer userId = (Integer) session.getAttribute("userId");
         if (userId == null)
             throw new IllegalArgumentException("로그인이 필요합니다.");
-        return new TodoResponseDto(todoService.toggleComplete(id));
+        return todoService.toggleComplete(id);
     }
 
     // 투두 내용 수정
@@ -77,15 +62,7 @@ public class TodoController {
         Integer userId = (Integer) session.getAttribute("userId");
         if (userId == null)
             throw new IllegalArgumentException("로그인이 필요합니다.");
-
-        Todo todoDetails = new Todo();
-        todoDetails.setTitle(request.getTitle());
-        todoDetails.setDescription(request.getDescription());
-        todoDetails.setTodoDate(request.getTodoDate());
-        todoDetails.setTodoTime(request.getTodoTime());
-        todoDetails.setPriority(request.getPriority());
-
-        return new TodoResponseDto(todoService.updateTodo(id, todoDetails));
+        return todoService.updateTodo(id, request);
     }
 
     // 투두 삭제
