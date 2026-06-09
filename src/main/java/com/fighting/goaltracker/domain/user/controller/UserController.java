@@ -61,6 +61,8 @@ public class UserController {
     @PatchMapping("/me")
     public User updateProfile(@RequestBody User updateRequest, HttpSession session) {
         Integer currentUserId = (Integer) session.getAttribute("userId"); // 세션에서 userId 꺼내기
+        if (currentUserId == null)
+            throw new IllegalArgumentException("로그인이 필요합니다.");
         return userService.updateProfile(currentUserId, updateRequest);
     }
 

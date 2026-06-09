@@ -28,9 +28,8 @@ public class RoutineRecordService {
     public String toggleRoutineCheck(Integer userId, Integer routineId, String dateStr) {
         LocalDate recordDate = LocalDate.parse(dateStr);
 
-        // ⭕ 수정 완료: 리포지토리 변경 사항에 맞춰 findByRoutineRoutineIdAndRecordDate로 이름을 맞췄습니다.
         Optional<RoutineRecord> existingRecord = routineRecordRepository
-                .findByRoutineIdAndRecordDate(routineId, recordDate);
+                .findByRoutine_RoutineIdAndRecordDate(routineId, recordDate);
 
         if (existingRecord.isPresent()) {
             // 이미 기록이 존재한다면 -> 체크 해제 요청이므로 기록을 삭제
