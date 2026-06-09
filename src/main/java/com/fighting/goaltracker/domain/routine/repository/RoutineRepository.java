@@ -14,10 +14,12 @@ public interface RoutineRepository extends JpaRepository<Routine, Integer> {
     // 특정 유저의 모든 루틴 조회
     List<Routine> findByUser_UserId(Integer userId);
 
-    // 💡 1:N 컬렉션 테이블(routine_repeat_days)에서 오늘 요일(DayOfWeek)과 일치하고 활성화된 루틴 조회
+    // routine_repeat_days에서 오늘 요일(DayOfWeek)과 일치하고 활성화된 루틴 조회 (오늘의 루틴)
     @Query("SELECT r FROM Routine r JOIN r.repeatDays d WHERE r.user.userId = :userId AND r.isActive = true AND d = :dayOfWeek")
     List<Routine> findActiveRoutinesByDay(@Param("userId") Integer userId, @Param("dayOfWeek") DayOfWeek dayOfWeek);
 
     // 같은 유저가 같은 이름의 루틴을 가지고 있는지 확인
     List<Routine> findByUser_UserIdAndTitle(Integer userId, String title);
+
+    void deleteByUser_UserId(Integer userId);
 }

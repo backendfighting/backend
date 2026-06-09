@@ -6,11 +6,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fighting.goaltracker.domain.todo.repository.TodoRepository;
+import com.fighting.goaltracker.domain.routine.repository.RoutineRepository;
+import com.fighting.goaltracker.domain.record.repository.RoutineRecordRepository;
+
 @Service
 public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private TodoRepository todoRepository;
+
+    @Autowired
+    private RoutineRepository routineRepository;
+
+    @Autowired
+    private RoutineRecordRepository routineRecordRepository;
 
     // 회원가입
     @Transactional
@@ -77,5 +90,16 @@ public class UserService {
 
         user.setPassword(newPassword);
         userRepository.save(user);
+    }
+
+    // 회원 탈퇴
+    @Transactional
+    public void deleteUser(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        routineRecordRepository.deleteByUser_UserId(userId);
+        routineRepository.deleteByUser_UserId(userId);
+        todoRepository.deleteByUser_UserId(userId);
+        userRepository.delete(user);
     }
 }
