@@ -61,6 +61,8 @@ public class UserController {
     @PatchMapping("/me")
     public User updateProfile(@RequestBody User updateRequest, HttpSession session) {
         Integer currentUserId = (Integer) session.getAttribute("userId"); // 세션에서 userId 꺼내기
+        if (currentUserId == null)
+            throw new IllegalArgumentException("로그인이 필요합니다.");
         return userService.updateProfile(currentUserId, updateRequest);
     }
 
@@ -69,9 +71,24 @@ public class UserController {
     @PutMapping("/password")
     public String updatePassword(@RequestBody Map<String, String> passwordRequest, HttpSession session) {
         Integer currentUserId = (Integer) session.getAttribute("userId");
+        if (currentUserId == null)
+            throw new IllegalArgumentException("로그인이 필요합니다.");
+
         String currentPassword = passwordRequest.get("currentPassword");
         String newPassword = passwordRequest.get("newPassword");
         userService.updatePassword(currentUserId, currentPassword, newPassword);
         return "비밀번호가 성공적으로 변경되었습니다.";
+    }
+
+    // 회원 탈퇴 (DELETE /api/users/me)
+    @Operation(summary = "회원 탈퇴", description = "현재 로그인한 유저의 계정 및 모든 데이터 삭제")
+    @DeleteMapping("/me")
+    public String deleteUser(HttpSession session) {
+        Integer userId = (Integer) session.getAttribute("userId");
+        if (userId == null)
+            throw new IllegalArgumentException("로그인이 필요합니다.");
+        userService.deleteUser(userId);
+        session.invalidate(); // 세션도 같이 삭제
+        return "회원 탈퇴가 완료되었습니다.";
     }
 }

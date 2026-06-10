@@ -1,6 +1,7 @@
 package com.fighting.goaltracker.domain.record.controller;
 
-import com.fighting.goaltracker.domain.record.entity.RoutineRecord;
+import com.fighting.goaltracker.domain.record.dto.RoutineRecordResponseDto;
+import java.util.stream.Collectors;
 import com.fighting.goaltracker.domain.record.service.RoutineRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -34,12 +35,15 @@ public class RoutineRecordController {
     // 특정 날짜의 루틴 달성 기록 조회
     @Operation(summary = "특정 날짜의 루틴 달성 기록 조회", description = "날짜를 기준으로 해당 일자의 루틴 달성 기록 목록 조회")
     @GetMapping
-    public List<RoutineRecord> getRecordsByDate(
+    public List<RoutineRecordResponseDto> getRecordsByDate(
             @RequestParam("date") @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate date,
             HttpSession session) {
         Integer userId = (Integer) session.getAttribute("userId");
         if (userId == null)
             throw new IllegalArgumentException("로그인이 필요합니다.");
-        return routineRecordService.getRecordsByDate(userId, date);
+        return routineRecordService.getRecordsByDate(userId, date)
+                .stream()
+                .map(RoutineRecordResponseDto::new)
+                .collect(java.util.stream.Collectors.toList());
     }
 }

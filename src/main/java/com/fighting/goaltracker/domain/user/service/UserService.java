@@ -6,11 +6,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fighting.goaltracker.domain.todo.repository.TodoRepository;
+import com.fighting.goaltracker.domain.routine.repository.RoutineRepository;
+import com.fighting.goaltracker.domain.record.repository.RoutineRecordRepository;
+
 @Service
 public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private TodoRepository todoRepository;
+
+    @Autowired
+    private RoutineRepository routineRepository;
+
+    @Autowired
+    private RoutineRecordRepository routineRecordRepository;
 
     // 회원가입
     @Transactional
@@ -21,7 +34,7 @@ public class UserService {
                     throw new IllegalArgumentException("이미 가입된 이메일 주소입니다.");
                 });
 
-        // 중복이 없다면 정상적으로 저장
+        // 중복 없으면 정상적으로 저장
         return userRepository.save(user);
     }
 
@@ -32,7 +45,7 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
     }
 
-    // 로그인 인증
+    // 로그인
     @Transactional(readOnly = true)
     public User login(String email, String password) {
         // 이메일로 사용자 찾기
@@ -53,7 +66,7 @@ public class UserService {
         User user = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-        // 값이 있을 때만 변경
+        // 값이 있을 때만 변경, null은 기존값 유지
         if (updateRequest.getName() != null) {
             user.setName(updateRequest.getName());
         }
@@ -77,5 +90,16 @@ public class UserService {
 
         user.setPassword(newPassword);
         userRepository.save(user);
+    }
+
+    // 회원 탈퇴
+    @Transactional
+    public void deleteUser(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        routineRecordRepository.deleteByUser_UserId(userId);
+        routineRepository.deleteByUser_UserId(userId);
+        todoRepository.deleteByUser_UserId(userId);
+        userRepository.delete(user);
     }
 }

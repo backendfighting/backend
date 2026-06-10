@@ -19,4 +19,6 @@ public interface TodoRepository extends JpaRepository<Todo, Integer> {
     // 날짜 + 시간이 같은 투두 확인
     List<Todo> findByUser_UserIdAndTodoDateAndTodoTime(Integer userId, LocalDate todoDate, LocalTime todoTime);
 
+    void deleteByUser_UserId(Integer userId);
+
 }

@@ -50,7 +50,7 @@ public class TodoService {
                 .description(request.getDescription())
                 .todoDate(request.getTodoDate())
                 .todoTime(request.getTodoTime())
-                .priority(request.getPriority())
+                .priority(request.getPriority() != null ? request.getPriority() : "MEDIUM") // 기본값 MEDIUM
                 .build();
 
         return new TodoResponseDto(todoRepository.save(todo));

@@ -16,4 +16,6 @@ public interface RoutineRecordRepository extends JpaRepository<RoutineRecord, In
 
     // 특정 루틴이 특정 날짜에 이미 체크되었는지 확인하기 위한 용도
     Optional<RoutineRecord> findByRoutine_RoutineIdAndRecordDate(Integer routineId, LocalDate recordDate);
+
+    void deleteByUser_UserId(Integer userId);
 }
