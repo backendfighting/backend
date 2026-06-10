@@ -15,7 +15,7 @@ import jakarta.servlet.http.HttpSession;
 @Tag(name = "사용자(User)", description = "회원가입, 로그인, 정보 조회 및 수정")
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin(origins = "*", allowedHeaders = "*") // 프론트 협업용 CORS 임시 전면 허용
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true", allowedHeaders = "*")
 public class UserController {
 
     @Autowired
@@ -32,11 +32,14 @@ public class UserController {
         return userService.signup(user);
     }
 
-    // 사용자 조회 (ID로 찾기) (GET /api/users/1)
-    @Operation(summary = "사용자 조회(ID)", description = "유저의 고유 식별자(ID)를 이용해 해당 사용자의 상세 정보를 조회")
-    @GetMapping("/{id}")
-    public User getUserById(@PathVariable("id") Integer id) {
-        return userService.getUserById(id);
+// 내 정보 조회 (GET /api/users/me)
+    @Operation(summary = "내 정보 조회", description = "현재 로그인한 유저의 상세 정보 조회")
+    @GetMapping("/me")
+    public User getCurrentUser(HttpSession session) {
+        Integer currentUserId = (Integer) session.getAttribute("userId");
+        if (currentUserId == null)
+            throw new IllegalArgumentException("로그인이 필요합니다.");
+        return userService.getUserById(currentUserId);
     }
 
     // 로그인 (POST /api/users/login)
