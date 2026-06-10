@@ -28,30 +28,30 @@ public class RoutineRecordService {
     public String toggleRoutineCheck(Integer userId, Integer routineId, String dateStr) {
         LocalDate recordDate = LocalDate.parse(dateStr);
 
-        // ⭕ 수정 완료: 리포지토리 변경 사항에 맞춰 findByRoutineRoutineIdAndRecordDate로 이름을 맞췄습니다.
+        // 🎯 레포지토리 규칙에 맞게 '_'(언더바)를 넣어 매칭 성공!
         Optional<RoutineRecord> existingRecord = routineRecordRepository
-                .findByRoutineIdAndRecordDate(routineId, recordDate);
+                .findByRoutine_RoutineIdAndRecordDate(routineId, recordDate);
 
         if (existingRecord.isPresent()) {
             // 이미 기록이 존재한다면 -> 체크 해제 요청이므로 기록을 삭제
             routineRecordRepository.delete(existingRecord.get());
-            return "수행 취소"; // 테스트용 출력(추후 삭제)
+            return "수행 취소"; 
         } else {
             // 기록이 없다면 -> 새롭게 완료 처리
             Routine routine = routineRepository.findById(routineId)
                     .orElseThrow(() -> new IllegalArgumentException("해당 루틴을 찾을 수 없습니다."));
 
-            User user = routine.getUser(); // 루틴에 묶여있는 유저 객체 가져오기
+            User user = routine.getUser(); 
 
             RoutineRecord record = new RoutineRecord();
             record.setRoutine(routine);
             record.setUser(user);
             record.setRecordDate(recordDate);
             record.setCompleted(true);
-            record.setCompletedAt(LocalDateTime.now()); // 현재 완수 시각 저장
+            record.setCompletedAt(LocalDateTime.now()); 
 
             routineRecordRepository.save(record);
-            return "수행 완료"; // 테스트용 출력(추후 삭제)
+            return "수행 완료"; 
         }
     }
 
