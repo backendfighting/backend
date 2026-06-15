@@ -44,13 +44,11 @@ public class RoutineService {
         return routineRepository.save(routine);
     }
 
-    // 특정 유저의 '오늘' 해야 하는 활성화된 루틴 목록 조회
+    // 특정 유저의 오늘 해야 하는 활성화된 루틴 목록 조회
     @Transactional(readOnly = true)
-    public List<Routine> getTodayRoutines(Integer userId) {
-        DayOfWeek today = LocalDate.now().getDayOfWeek();
-
-        // Repository의 커스텀 쿼리 호출 (Enum 객체를 그대로 넘김)
-        return routineRepository.findActiveRoutinesByDay(userId, today);
+    public List<Routine> getRoutinesByDate(Integer userId, LocalDate date) {
+        DayOfWeek dayOfWeek = date.getDayOfWeek();
+        return routineRepository.findActiveRoutinesByDay(userId, dayOfWeek);
     }
 
     // 루틴 상세 조회 로직

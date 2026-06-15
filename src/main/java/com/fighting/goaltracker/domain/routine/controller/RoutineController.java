@@ -7,6 +7,8 @@ import com.fighting.goaltracker.domain.routine.entity.Routine;
 import com.fighting.goaltracker.domain.routine.service.RoutineService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 import java.util.List;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,13 +39,15 @@ public class RoutineController {
     }
 
     // 오늘의 루틴 목록 조회
-    @Operation(summary = "오늘의 루틴 목록 조회", description = "유저 ID를 기준으로 금일 수행해야 할 루틴 목록 조회")
-    @GetMapping("/today")
-    public List<RoutineResponseDto> getTodayRoutines(HttpSession session) {
+    @Operation(summary = "날짜별 루틴 목록 조회", description = "특정 날짜의 루틴 목록 조회")
+    @GetMapping
+    public List<RoutineResponseDto> getRoutinesByDate(
+            @RequestParam("date") LocalDate date,
+            HttpSession session) {
         Integer userId = (Integer) session.getAttribute("userId");
         if (userId == null)
             throw new IllegalArgumentException("로그인이 필요합니다.");
-        return routineService.getTodayRoutines(userId)
+        return routineService.getRoutinesByDate(userId, date)
                 .stream()
                 .map(RoutineResponseDto::new)
                 .collect(java.util.stream.Collectors.toList());

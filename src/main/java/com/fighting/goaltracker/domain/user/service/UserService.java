@@ -92,7 +92,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    // 회원 탈퇴
+    // 회원 탈퇴 (회원 정보 삭제)
     @Transactional
     public void deleteUser(Integer userId) {
         User user = userRepository.findById(userId)
