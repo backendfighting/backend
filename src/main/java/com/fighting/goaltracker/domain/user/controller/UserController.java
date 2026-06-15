@@ -32,7 +32,7 @@ public class UserController {
         return userService.signup(user);
     }
 
-// 내 정보 조회 (GET /api/users/me)
+    // 내 정보 조회 (GET /api/users/me)
     @Operation(summary = "내 정보 조회", description = "현재 로그인한 유저의 상세 정보 조회")
     @GetMapping("/me")
     public User getCurrentUser(HttpSession session) {

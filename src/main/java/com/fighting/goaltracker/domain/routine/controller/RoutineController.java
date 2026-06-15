@@ -38,9 +38,9 @@ public class RoutineController {
         return new RoutineResponseDto(routineService.createRoutine(userId, routine));
     }
 
-    // 오늘의 루틴 목록 조회
+    // 날짜별 루틴 목록 조회
     @Operation(summary = "날짜별 루틴 목록 조회", description = "특정 날짜의 루틴 목록 조회")
-    @GetMapping
+    @GetMapping("/list")
     public List<RoutineResponseDto> getRoutinesByDate(
             @RequestParam("date") LocalDate date,
             HttpSession session) {
