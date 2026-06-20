@@ -2,6 +2,7 @@ package com.fighting.goaltracker.domain.user.service;
 
 import com.fighting.goaltracker.domain.user.entity.User;
 import com.fighting.goaltracker.domain.user.repository.UserRepository;
+import com.fighting.goaltracker.domain.user.dto.UpdateProfileRequestDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,11 +63,10 @@ public class UserService {
 
     // 내 정보 수정
     @Transactional
-    public User updateProfile(Integer currentUserId, User updateRequest) {
+    public User updateProfile(Integer currentUserId, UpdateProfileRequestDto updateRequest) {
         User user = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-        // 값이 있을 때만 변경, null은 기존값 유지
         if (updateRequest.getName() != null) {
             user.setName(updateRequest.getName());
         }
