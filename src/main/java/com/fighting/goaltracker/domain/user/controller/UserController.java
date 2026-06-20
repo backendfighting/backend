@@ -17,7 +17,6 @@ import jakarta.servlet.http.HttpSession;
 @Tag(name = "사용자(User)", description = "회원가입, 로그인, 정보 조회 및 수정")
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true", allowedHeaders = "*")
 public class UserController {
 
     @Autowired

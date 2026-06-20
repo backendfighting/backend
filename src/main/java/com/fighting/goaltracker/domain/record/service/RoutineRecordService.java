@@ -25,7 +25,7 @@ public class RoutineRecordService {
 
     // 루틴 완료 체크 토글 (프론트엔드에서 체크박스 누를 때 실행)
     @Transactional
-    public String toggleRoutineCheck(Integer userId, Integer routineId, String dateStr) {
+    public void toggleRoutineCheck(Integer userId, Integer routineId, String dateStr) {
         LocalDate recordDate = LocalDate.parse(dateStr);
 
         Optional<RoutineRecord> existingRecord = routineRecordRepository
@@ -34,7 +34,6 @@ public class RoutineRecordService {
         if (existingRecord.isPresent()) {
             // 이미 기록이 존재한다면 -> 체크 해제 요청이므로 기록을 삭제
             routineRecordRepository.delete(existingRecord.get());
-            return "수행 취소";
         } else {
             // 기록이 없다면 -> 새롭게 완료 처리
             Routine routine = routineRepository.findById(routineId)
@@ -50,7 +49,6 @@ public class RoutineRecordService {
             record.setCompletedAt(LocalDateTime.now());
 
             routineRecordRepository.save(record);
-            return "수행 완료";
         }
     }
 

@@ -17,7 +17,6 @@ import jakarta.servlet.http.HttpSession;
 @Tag(name = "루틴(Routine)", description = "루틴 생성, 조회, 수정 및 삭제 관련 API")
 @RestController
 @RequestMapping("/api/routines")
-@CrossOrigin(origins = "*", allowedHeaders = "*") // 프론트 협업용 CORS 임시 허용
 public class RoutineController {
 
     @Autowired
