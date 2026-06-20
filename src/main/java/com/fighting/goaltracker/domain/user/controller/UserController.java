@@ -9,10 +9,15 @@ import com.fighting.goaltracker.domain.user.entity.User;
 import com.fighting.goaltracker.domain.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 import java.util.Map;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+
+import com.fighting.goaltracker.global.jwt.JwtUtil;
 
 @Tag(name = "사용자(User)", description = "회원가입, 로그인, 정보 조회 및 수정")
 @RestController
@@ -21,6 +26,8 @@ public class UserController {
 
     @Autowired
     private UserService userService; // Repository 대신 Service를 주입받음
+    @Autowired
+    private JwtUtil jwtUtil;
 
     // 회원가입 (POST /api/users/signup)
     @Operation(summary = "회원가입", description = "새로운 유저 정보를 받아 회원가입 진행")
@@ -36,35 +43,31 @@ public class UserController {
     // 내 정보 조회 (GET /api/users/me)
     @Operation(summary = "내 정보 조회", description = "현재 로그인한 유저의 상세 정보 조회")
     @GetMapping("/me")
-    public UserResponseDto getCurrentUser(HttpSession session) {
-        Integer currentUserId = (Integer) session.getAttribute("userId");
+    public UserResponseDto getCurrentUser(HttpServletRequest request) {
+        Integer currentUserId = (Integer) request.getAttribute("userId");
         if (currentUserId == null)
             throw new IllegalArgumentException("로그인이 필요합니다.");
         return new UserResponseDto(userService.getUserById(currentUserId));
     }
 
     // 로그인 (POST /api/users/login)
-    @Operation(summary = "로그인", description = "이메일과 비밀번호를 검증하여 로그인")
+    @Operation(summary = "로그인", description = "이메일과 비밀번호를 검증하여 로그인, JWT 토큰 발급")
     @PostMapping("/login")
-    public UserResponseDto login(@RequestBody LoginRequestDto request, HttpSession session) {
+    public Map<String, Object> login(@RequestBody LoginRequestDto request) {
         User user = userService.login(request.getEmail(), request.getPassword());
-        session.setAttribute("userId", user.getUserId());
-        return new UserResponseDto(user);
-    }
+        String token = jwtUtil.generateToken(user.getUserId());
 
-    // 로그아웃 (POST /api/users/logout)
-    @Operation(summary = "로그아웃", description = "현재 로그인한 유저의 세션을 삭제하여 로그아웃 처리")
-    @PostMapping("/logout")
-    public String logout(HttpSession session) {
-        session.invalidate(); // 세션 전체 삭제
-        return "로그아웃 되었습니다.";
+        Map<String, Object> response = new HashMap<>();
+        response.put("token", token);
+        response.put("user", new UserResponseDto(user));
+        return response;
     }
 
     // 내 정보 수정 (PATCH /api/users/me)
     @Operation(summary = "내 정보 수정", description = "현재 로그인한 유저의 프로필 정보 수정")
     @PatchMapping("/me")
-    public UserResponseDto updateProfile(@RequestBody UpdateProfileRequestDto request, HttpSession session) {
-        Integer currentUserId = (Integer) session.getAttribute("userId");
+    public UserResponseDto updateProfile(@RequestBody UpdateProfileRequestDto request, HttpServletRequest httpRequest) {
+        Integer currentUserId = (Integer) httpRequest.getAttribute("userId");
         if (currentUserId == null)
             throw new IllegalArgumentException("로그인이 필요합니다.");
         return new UserResponseDto(userService.updateProfile(currentUserId, request));
@@ -73,8 +76,8 @@ public class UserController {
     // 비밀번호 변경 (PUT /api/users/password)
     @Operation(summary = "비밀번호 변경", description = "현재 로그인한 유저의 비밀번호 변경")
     @PutMapping("/password")
-    public String updatePassword(@RequestBody Map<String, String> passwordRequest, HttpSession session) {
-        Integer currentUserId = (Integer) session.getAttribute("userId");
+    public String updatePassword(@RequestBody Map<String, String> passwordRequest, HttpServletRequest request) {
+        Integer currentUserId = (Integer) request.getAttribute("userId");
         if (currentUserId == null)
             throw new IllegalArgumentException("로그인이 필요합니다.");
 
@@ -87,12 +90,11 @@ public class UserController {
     // 회원 탈퇴 (DELETE /api/users/me)
     @Operation(summary = "회원 탈퇴", description = "현재 로그인한 유저의 계정 및 모든 데이터 삭제")
     @DeleteMapping("/me")
-    public String deleteUser(HttpSession session) {
-        Integer userId = (Integer) session.getAttribute("userId");
+    public String deleteUser(HttpServletRequest request) {
+        Integer userId = (Integer) request.getAttribute("userId");
         if (userId == null)
             throw new IllegalArgumentException("로그인이 필요합니다.");
         userService.deleteUser(userId);
-        session.invalidate(); // 세션도 같이 삭제
         return "회원 탈퇴가 완료되었습니다.";
     }
 }
