@@ -4,6 +4,7 @@ import com.fighting.goaltracker.domain.user.dto.LoginRequestDto;
 import com.fighting.goaltracker.domain.user.dto.SignupRequestDto;
 import com.fighting.goaltracker.domain.user.dto.UserResponseDto;
 import com.fighting.goaltracker.domain.user.dto.UpdateProfileRequestDto;
+import com.fighting.goaltracker.domain.user.dto.UpdatePasswordRequestDto;
 
 import com.fighting.goaltracker.domain.user.entity.User;
 import com.fighting.goaltracker.domain.user.service.UserService;
@@ -15,7 +16,6 @@ import java.util.Map;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 
 import com.fighting.goaltracker.global.jwt.JwtUtil;
 
@@ -45,8 +45,6 @@ public class UserController {
     @GetMapping("/me")
     public UserResponseDto getCurrentUser(HttpServletRequest request) {
         Integer currentUserId = (Integer) request.getAttribute("userId");
-        if (currentUserId == null)
-            throw new IllegalArgumentException("로그인이 필요합니다.");
         return new UserResponseDto(userService.getUserById(currentUserId));
     }
 
@@ -68,22 +66,16 @@ public class UserController {
     @PatchMapping("/me")
     public UserResponseDto updateProfile(@RequestBody UpdateProfileRequestDto request, HttpServletRequest httpRequest) {
         Integer currentUserId = (Integer) httpRequest.getAttribute("userId");
-        if (currentUserId == null)
-            throw new IllegalArgumentException("로그인이 필요합니다.");
         return new UserResponseDto(userService.updateProfile(currentUserId, request));
     }
 
     // 비밀번호 변경 (PUT /api/users/password)
     @Operation(summary = "비밀번호 변경", description = "현재 로그인한 유저의 비밀번호 변경")
     @PutMapping("/password")
-    public String updatePassword(@RequestBody Map<String, String> passwordRequest, HttpServletRequest request) {
-        Integer currentUserId = (Integer) request.getAttribute("userId");
-        if (currentUserId == null)
-            throw new IllegalArgumentException("로그인이 필요합니다.");
+    public String updatePassword(@RequestBody UpdatePasswordRequestDto request, HttpServletRequest httpRequest) {
+        Integer currentUserId = (Integer) httpRequest.getAttribute("userId");
 
-        String currentPassword = passwordRequest.get("currentPassword");
-        String newPassword = passwordRequest.get("newPassword");
-        userService.updatePassword(currentUserId, currentPassword, newPassword);
+        userService.updatePassword(currentUserId, request.getCurrentPassword(), request.getNewPassword());
         return "비밀번호가 성공적으로 변경되었습니다.";
     }
 
@@ -92,8 +84,6 @@ public class UserController {
     @DeleteMapping("/me")
     public String deleteUser(HttpServletRequest request) {
         Integer userId = (Integer) request.getAttribute("userId");
-        if (userId == null)
-            throw new IllegalArgumentException("로그인이 필요합니다.");
         userService.deleteUser(userId);
         return "회원 탈퇴가 완료되었습니다.";
     }

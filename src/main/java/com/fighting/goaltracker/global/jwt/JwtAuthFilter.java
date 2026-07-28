@@ -22,7 +22,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
-        // 로그인, 회원가입은 토큰 검증 없이 통과
+        // 로그인, 회원가입, Swagger는 토큰 검증 없이 통과
         if (path.equals("/api/users/login") || path.equals("/api/users/signup")
                 || path.startsWith("/swagger-ui") || path.startsWith("/v3/api-docs")) {
             filterChain.doFilter(request, response);
@@ -31,15 +31,30 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String authHeader = request.getHeader("Authorization");
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
-
-            if (jwtUtil.validateToken(token)) {
-                Integer userId = jwtUtil.extractUserId(token);
-                request.setAttribute("userId", userId);
-            }
+        // 토큰이 없거나 형식이 잘못된 경우
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            sendUnauthorized(response, "로그인이 필요합니다.");
+            return;
         }
 
+        String token = authHeader.substring(7);
+
+        // 토큰이 유효하지 않은 경우
+        if (!jwtUtil.validateToken(token)) {
+            sendUnauthorized(response, "유효하지 않은 토큰입니다.");
+            return;
+        }
+
+        // 토큰이 유효하면 userId를 요청에 담고 통과
+        Integer userId = jwtUtil.extractUserId(token);
+        request.setAttribute("userId", userId);
         filterChain.doFilter(request, response);
+    }
+
+    // 401 에러 응답 보내는 메서드
+    private void sendUnauthorized(HttpServletResponse response, String message) throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+        response.setContentType("application/json;charset=UTF-8");
+        response.getWriter().write("{\"status\": 401, \"error\": \"Unauthorized\", \"message\": \"" + message + "\"}");
     }
 }
