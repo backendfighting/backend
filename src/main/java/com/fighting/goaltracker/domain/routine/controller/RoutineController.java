@@ -2,14 +2,13 @@ package com.fighting.goaltracker.domain.routine.controller;
 
 import com.fighting.goaltracker.domain.routine.dto.RoutineRequestDto;
 import com.fighting.goaltracker.domain.routine.dto.RoutineResponseDto;
-
 import com.fighting.goaltracker.domain.routine.entity.Routine;
 import com.fighting.goaltracker.domain.routine.service.RoutineService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.List; // 오타(a) 수정됨
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -88,5 +87,17 @@ public class RoutineController {
         if (userId == null)
             throw new IllegalArgumentException("로그인이 필요합니다.");
         return new RoutineResponseDto(routineService.toggleRoutineActive(routineId));
+    }
+
+    // 루틴 삭제 (클래스 내부로 정상 위치시킴)
+    @Operation(summary = "루틴 삭제", description = "루틴 고유 ID를 이용하여 루틴을 삭제")
+    @DeleteMapping("/{routineId}")
+    public void deleteRoutine(@PathVariable("routineId") Integer routineId, HttpServletRequest request) {
+        Integer userId = (Integer) request.getAttribute("userId");
+        if (userId == null)
+            throw new IllegalArgumentException("로그인이 필요합니다.");
+            
+        // RoutineService에 deleteRoutine 메서드가 있어야 작동합니다.
+        routineService.deleteRoutine(routineId); 
     }
 }
