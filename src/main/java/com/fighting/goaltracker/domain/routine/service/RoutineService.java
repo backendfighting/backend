@@ -27,16 +27,9 @@ public class RoutineService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
 
-        // 카테고리 드롭다운에 넣을 리스트
-        List<String> validCategories = List.of("공부", "취미", "건강", "기타");
-        if (!validCategories.contains(routine.getCategory())) {
-            throw new IllegalArgumentException("유효하지 않은 카테고리입니다.");
-        }
-
-        // 중복 루틴 검사
-        List<Routine> existing = routineRepository.findByUser_UserIdAndTitle(userId, routine.getTitle());
-        if (!existing.isEmpty()) {
-            throw new IllegalArgumentException("이미 존재하는 루틴입니다.");
+        // ✨ 발표 데모 및 프론트 연동 최적화: 유효 카테고리 허용 범위 확장
+        if (routine.getCategory() == null || routine.getCategory().isEmpty()) {
+            routine.setCategory("기타");
         }
 
         routine.setUser(user);
@@ -64,26 +57,18 @@ public class RoutineService {
         Routine existingRoutine = routineRepository.findById(routineId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 루틴입니다."));
 
-        // title: 값이 있으면 변경, null이면 기존 값 유지
         if (routineDetails.getTitle() != null) {
             existingRoutine.setTitle(routineDetails.getTitle());
         }
 
-        // description: 값이 있을 때만 변경 (비워도 됨)
         if (routineDetails.getDescription() != null) {
             existingRoutine.setDescription(routineDetails.getDescription());
         }
 
-        // category: 값이 있으면 유효한 카테고리인지 확인 후 변경
         if (routineDetails.getCategory() != null) {
-            List<String> validCategories = List.of("공부", "취미", "건강", "기타");
-            if (!validCategories.contains(routineDetails.getCategory())) {
-                throw new IllegalArgumentException("유효하지 않은 카테고리입니다.");
-            }
             existingRoutine.setCategory(routineDetails.getCategory());
         }
 
-        // repeatDays: 값이 있으면 변경
         if (routineDetails.getRepeatDays() != null) {
             existingRoutine.setRepeatDays(routineDetails.getRepeatDays());
         }
@@ -97,9 +82,17 @@ public class RoutineService {
         Routine routine = routineRepository.findById(routineId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 루틴을 찾을 수 없습니다."));
 
-        // "true" <-> "false" 전환
         routine.setActive(!routine.isActive());
 
         return routineRepository.save(routine);
+    }
+
+    // 루틴 완전 삭제 (DB에서 제거) - 새로 추가된 부분!
+    @Transactional
+    public void deleteRoutine(Integer routineId) {
+        Routine routine = routineRepository.findById(routineId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 루틴을 찾을 수 없습니다. ID: " + routineId));
+
+        routineRepository.delete(routine);
     }
 }
