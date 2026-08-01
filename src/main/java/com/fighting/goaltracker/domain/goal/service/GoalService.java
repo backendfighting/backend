@@ -14,35 +14,35 @@ import java.util.List;
 @Service
 public class GoalService {
 
-    @Autowired
-    private GoalRepository goalRepository;
+        @Autowired
+        private GoalRepository goalRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+        @Autowired
+        private UserRepository userRepository;
 
-    // 목표 생성
-    @Transactional
-    public Goal createGoal(Integer userId, GoalRequestDto request) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        // 목표 생성
+        @Transactional
+        public Goal createGoal(Integer userId, GoalRequestDto request) {
+                User user = userRepository.findById(userId)
+                                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-        Goal goal = new Goal();
-        goal.setUser(user);
-        goal.setTitle(request.getTitle());
-        goal.setCategory(request.getCategory());
-        goal.setDescription(request.getDescription());
-        goal.setStartDate(request.getStartDate());
-        goal.setEndDate(request.getEndDate());
-        goal.setProgress(request.getProgress() != null ? request.getProgress() : 0);
-        goal.setStatus(request.getStatus() != null ? request.getStatus() : "진행중");
-        goal.setReason(request.getReason());
+                Goal goal = new Goal();
+                goal.setUser(user);
+                goal.setTitle(request.getTitle());
+                goal.setCategory(request.getCategory());
+                goal.setDescription(request.getDescription());
+                goal.setStartDate(request.getStartDate());
+                goal.setEndDate(request.getEndDate());
+                goal.setProgress(request.getProgress() != null ? request.getProgress() : 0);
+                goal.setStatus(request.getStatus() != null ? request.getStatus() : "진행중");
+                goal.setReason(request.getReason());
 
-        return goalRepository.save(goal);
-    }
+                return goalRepository.save(goal);
+        }
 
-    // 유저의 전체 목표 조회
-    @Transactional(readOnly = true)
-    public List<Goal> getGoalsByUser(Integer userId) {
-        return goalRepository.findByUser_UserId(userId);
-    }
+        // 유저의 전체 목표 조회
+        @Transactional(readOnly = true)
+        public List<Goal> getGoalsByUser(Integer userId) {
+                return goalRepository.findByUser_UserId(userId);
+        }
 }
