@@ -18,4 +18,6 @@ public interface RoutineRecordRepository extends JpaRepository<RoutineRecord, In
     Optional<RoutineRecord> findByRoutine_RoutineIdAndRecordDate(Integer routineId, LocalDate recordDate);
 
     void deleteByUser_UserId(Integer userId);
+
+    void deleteByRoutine_RoutineId(Integer routineId);
 }

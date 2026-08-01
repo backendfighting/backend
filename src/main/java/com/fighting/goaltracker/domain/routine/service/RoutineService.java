@@ -1,5 +1,6 @@
 package com.fighting.goaltracker.domain.routine.service;
 
+import com.fighting.goaltracker.domain.record.repository.RoutineRecordRepository;
 import com.fighting.goaltracker.domain.routine.entity.Routine;
 import com.fighting.goaltracker.domain.routine.repository.RoutineRepository;
 import com.fighting.goaltracker.domain.user.entity.User;
@@ -17,6 +18,9 @@ public class RoutineService {
 
     @Autowired
     private RoutineRepository routineRepository;
+
+    @Autowired
+    private RoutineRecordRepository routineRecordRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -93,6 +97,7 @@ public class RoutineService {
         Routine routine = routineRepository.findById(routineId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 루틴을 찾을 수 없습니다. ID: " + routineId));
 
+        routineRecordRepository.deleteByRoutine_RoutineId(routineId);
         routineRepository.delete(routine);
     }
 }
