@@ -92,7 +92,7 @@ public class RoutineService {
     public void deleteRoutine(Integer routineId) {
         Routine routine = routineRepository.findById(routineId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 루틴을 찾을 수 없습니다. ID: " + routineId));
-
+;
         routineRepository.delete(routine);
     }
 }

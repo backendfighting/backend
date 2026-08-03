@@ -1,11 +1,14 @@
 package com.fighting.goaltracker.domain.routine.entity;
 
+import com.fighting.goaltracker.domain.record.entity.RoutineRecord;
 import com.fighting.goaltracker.domain.user.entity.User; // 유저 엔티티 임포트
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
@@ -33,6 +36,9 @@ public class Routine {
 
     @Column(length = 50)
     private String category;
+
+    @OneToMany(mappedBy = "routine", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RoutineRecord> routineRecords = new ArrayList<>();
 
     @ElementCollection(targetClass = DayOfWeek.class, fetch = FetchType.LAZY)
     @CollectionTable(name = "routine_repeat_days", joinColumns = @JoinColumn(name = "routine_id"))
