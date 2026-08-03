@@ -45,4 +45,34 @@ public class GoalService {
     public List<Goal> getGoalsByUser(Integer userId) {
         return goalRepository.findByUser_UserId(userId);
     }
+
+    // 🌟 1. 목표 상태 업데이트 기능 (성공/실패 처리)
+    @Transactional
+    public Goal updateGoalStatus(Integer userId, Integer goalId, String status, Integer progress, String reason) {
+        Goal goal = goalRepository.findById(goalId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 목표를 찾을 수 없습니다. ID: " + goalId));
+
+        if (!goal.getUser().getUserId().equals(userId)) {
+            throw new IllegalArgumentException("이 목표를 수정할 권한이 없습니다.");
+        }
+
+        if (status != null) goal.setStatus(status);
+        if (progress != null) goal.setProgress(progress);
+        if (reason != null) goal.setReason(reason);
+
+        return goalRepository.save(goal);
+    }
+
+    // 🌟 2. 목표 삭제 기능
+    @Transactional
+    public void deleteGoal(Integer userId, Integer goalId) {
+        Goal goal = goalRepository.findById(goalId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 목표를 찾을 수 없습니다. ID: " + goalId));
+
+        if (!goal.getUser().getUserId().equals(userId)) {
+            throw new IllegalArgumentException("이 목표를 삭제할 권한이 없습니다.");
+        }
+
+        goalRepository.delete(goal);
+    }
 }

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/goals")
@@ -30,5 +31,31 @@ public class GoalController {
         Integer userId = (Integer) httpRequest.getAttribute("userId");
         if (userId == null) throw new IllegalArgumentException("로그인이 필요합니다.");
         return goalService.getGoalsByUser(userId);
+    }
+
+    // 🌟 3. 목표 상태/결과 업데이트 API (PATCH)
+    @PatchMapping("/{goalId}/status")
+    public Goal updateGoalStatus(
+            @PathVariable Integer goalId,
+            @RequestBody Map<String, Object> updates,
+            HttpServletRequest httpRequest) {
+        
+        Integer userId = (Integer) httpRequest.getAttribute("userId");
+        if (userId == null) throw new IllegalArgumentException("로그인이 필요합니다.");
+
+        String status = (String) updates.get("status");
+        Integer progress = (Integer) updates.get("progress");
+        String reason = (String) updates.get("reason");
+
+        return goalService.updateGoalStatus(userId, goalId, status, progress, reason);
+    }
+
+    // 🌟 4. 목표 삭제 API (DELETE)
+    @DeleteMapping("/{goalId}")
+    public void deleteGoal(@PathVariable Integer goalId, HttpServletRequest httpRequest) {
+        Integer userId = (Integer) httpRequest.getAttribute("userId");
+        if (userId == null) throw new IllegalArgumentException("로그인이 필요합니다.");
+        
+        goalService.deleteGoal(userId, goalId);
     }
 }
