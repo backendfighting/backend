@@ -45,4 +45,25 @@ public class GoalService {
         public List<Goal> getGoalsByUser(Integer userId) {
                 return goalRepository.findByUser_UserId(userId);
         }
+
+        // 목표 수정
+        @Transactional
+        public Goal updateGoal(Integer goalId, GoalRequestDto request) {
+                Goal goal = goalRepository.findById(goalId)
+                                .orElseThrow(() -> new IllegalArgumentException("해당 목표를 찾을 수 없습니다."));
+
+                goal.update(request.getTitle(), request.getCategory(), request.getDescription(),
+                                request.getStartDate(), request.getEndDate(),
+                                request.getProgress(), request.getStatus(), request.getReason());
+
+                return goalRepository.save(goal);
+        }
+
+        // 목표 삭제
+        @Transactional
+        public void deleteGoal(Integer goalId) {
+                Goal goal = goalRepository.findById(goalId)
+                                .orElseThrow(() -> new IllegalArgumentException("해당 목표를 찾을 수 없습니다."));
+                goalRepository.delete(goal);
+        }
 }

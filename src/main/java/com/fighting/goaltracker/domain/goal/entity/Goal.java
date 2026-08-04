@@ -34,4 +34,25 @@ public class Goal {
     private Integer progress = 0;
     private String status = "진행중";
     private String reason;
+
+    public void update(String title, String category, String description,
+            LocalDate startDate, LocalDate endDate,
+            Integer progress, String status, String reason) {
+        if (title != null)
+            this.title = title;
+        if (category != null)
+            this.category = category;
+        if (description != null)
+            this.description = description;
+        if (startDate != null)
+            this.startDate = startDate;
+        if (endDate != null)
+            this.endDate = endDate;
+        if (progress != null)
+            this.progress = progress;
+        if (status != null)
+            this.status = status;
+        if (reason != null)
+            this.reason = reason;
+    }
 }

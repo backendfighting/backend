@@ -38,4 +38,19 @@ public class GoalController {
                 .map(GoalResponseDto::new)
                 .collect(Collectors.toList());
     }
+
+    // 목표 수정 (PUT /api/goals/{goalId})
+    @Operation(summary = "목표 수정", description = "목표 고유 ID를 이용해 목표 정보 수정")
+    @PutMapping("/{goalId}")
+    public GoalResponseDto updateGoal(@PathVariable("goalId") Integer goalId, @RequestBody GoalRequestDto request) {
+        return new GoalResponseDto(goalService.updateGoal(goalId, request));
+    }
+
+    // 목표 삭제 (DELETE /api/goals/{goalId})
+    @Operation(summary = "목표 삭제", description = "목표 고유 ID를 이용해 목표 삭제")
+    @DeleteMapping("/{goalId}")
+    public String deleteGoal(@PathVariable("goalId") Integer goalId) {
+        goalService.deleteGoal(goalId);
+        return "목표가 성공적으로 삭제되었습니다.";
+    }
 }
