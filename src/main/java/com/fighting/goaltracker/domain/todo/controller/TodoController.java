@@ -11,7 +11,6 @@ import java.util.List;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 
 @Tag(name = "할 일 (Todo)", description = "투두리스트 생성, 조회, 수정, 상태 변경, 삭제")
 @RestController
@@ -26,8 +25,6 @@ public class TodoController {
     @PostMapping
     public TodoResponseDto createTodo(@RequestBody TodoRequestDto request, HttpServletRequest httpRequest) {
         Integer userId = (Integer) httpRequest.getAttribute("userId");
-        if (userId == null)
-            throw new IllegalArgumentException("로그인이 필요합니다.");
         return todoService.createTodo(userId, request);
     }
 
@@ -38,8 +35,6 @@ public class TodoController {
             @RequestParam("date") LocalDate date,
             HttpServletRequest request) {
         Integer userId = (Integer) request.getAttribute("userId");
-        if (userId == null)
-            throw new IllegalArgumentException("로그인이 필요합니다.");
         return todoService.getTodosByDate(userId, date);
     }
 
@@ -48,8 +43,6 @@ public class TodoController {
     @PatchMapping("/{id}/complete")
     public TodoResponseDto toggleComplete(@PathVariable("id") Integer id, HttpServletRequest request) {
         Integer userId = (Integer) request.getAttribute("userId");
-        if (userId == null)
-            throw new IllegalArgumentException("로그인이 필요합니다.");
         return todoService.toggleComplete(id);
     }
 
@@ -59,8 +52,6 @@ public class TodoController {
     public TodoResponseDto updateTodo(@PathVariable("id") Integer id, @RequestBody TodoRequestDto request,
             HttpServletRequest httpRequest) {
         Integer userId = (Integer) httpRequest.getAttribute("userId");
-        if (userId == null)
-            throw new IllegalArgumentException("로그인이 필요합니다.");
         return todoService.updateTodo(id, request);
     }
 
@@ -69,8 +60,6 @@ public class TodoController {
     @DeleteMapping("/{id}")
     public String deleteTodo(@PathVariable("id") Integer id, HttpServletRequest request) {
         Integer userId = (Integer) request.getAttribute("userId");
-        if (userId == null)
-            throw new IllegalArgumentException("로그인이 필요합니다.");
         String title = todoService.deleteTodo(id);
         return "\"" + title + "\" 일정이 성공적으로 삭제되었습니다.";
     }

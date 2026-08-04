@@ -58,11 +58,16 @@ public class Todo {
     }
 
     public void update(String title, String description, LocalDate todoDate,
-                       LocalTime todoTime, String priority) {
-        if (title != null) this.title = title;
-        if (description != null) this.description = description;
-        if (todoDate != null) this.todoDate = todoDate;
-        if (todoTime != null) this.todoTime = todoTime;
-        if (priority != null) this.priority = priority;
+            LocalTime todoTime, String priority) {
+        if (title != null)
+            this.title = title;
+        if (description != null)
+            this.description = description;
+        if (todoDate != null)
+            this.todoDate = todoDate;
+        if (todoTime != null)
+            this.todoTime = todoTime;
+        if (priority != null)
+            this.priority = priority;
     }
 }
