@@ -12,10 +12,8 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    // 토큰 서명에 쓰일 비밀키 (서버에서만 알고 있어야 함)
     private final String SECRET = "goaltracker-secret-key-for-jwt-token-must-be-long-enough-32bytes!";
     private final SecretKey secretKey = Keys.hmacShaKeyFor(SECRET.getBytes());
-    // 토큰 유효 시간: 1일 (밀리초 단위)
     private final long expirationTime = 1000 * 60 * 60 * 24;
 
     // 토큰 발급
@@ -48,6 +46,21 @@ public class JwtUtil {
             return true;
         } catch (Exception e) {
             return false;
+        }
+    }
+
+    // 토큰 만료 여부 검증
+    public boolean isTokenExpired(String token) {
+        try {
+            Jwts.parser()
+                    .verifyWith(secretKey)
+                    .build()
+                    .parseSignedClaims(token);
+            return false; // 정상
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            return true; // 만료
+        } catch (Exception e) {
+            return false; // 그 외 문제 (위조 등)
         }
     }
 }

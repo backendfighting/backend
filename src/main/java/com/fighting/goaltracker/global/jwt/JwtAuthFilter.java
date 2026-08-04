@@ -40,18 +40,20 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String token = authHeader.substring(7);
 
         // 토큰이 유효하지 않은 경우
+        if (jwtUtil.isTokenExpired(token)) {
+            sendUnauthorized(response, "토큰이 만료되었습니다. 다시 로그인해주세요.");
+            return;
+        }
         if (!jwtUtil.validateToken(token)) {
             sendUnauthorized(response, "유효하지 않은 토큰입니다.");
             return;
         }
 
-        // 토큰이 유효하면 userId를 요청에 담고 통과
         Integer userId = jwtUtil.extractUserId(token);
         request.setAttribute("userId", userId);
         filterChain.doFilter(request, response);
     }
 
-    // 401 에러 응답 보내는 메서드
     private void sendUnauthorized(HttpServletResponse response, String message) throws IOException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
         response.setContentType("application/json;charset=UTF-8");
