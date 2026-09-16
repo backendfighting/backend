@@ -12,13 +12,10 @@ import java.util.List;
 public interface TodoRepository extends JpaRepository<Todo, Integer> {
     List<Todo> findByUser_UserIdAndTodoDate(Integer userId, LocalDate todoDate);
 
-    // 제목 + 날짜 + 시간이 같은 투두 확인
-    List<Todo> findByUser_UserIdAndTitleAndTodoDateAndTodoTime(Integer userId, String title, LocalDate todoDate,
-            LocalTime todoTime);
-
-    // 날짜 + 시간이 같은 투두 확인
-    List<Todo> findByUser_UserIdAndTodoDateAndTodoTime(Integer userId, LocalDate todoDate, LocalTime todoTime);
-
     void deleteByUser_UserId(Integer userId);
+
+    List<Todo> findByUser_UserIdAndTodoDateAndCompletedFalse(Integer userId, LocalDate todoDate);
+
+    Optional<Todo> findByTodoIdAndUser_UserId(Integer todoId, Integer userId);
 
 }

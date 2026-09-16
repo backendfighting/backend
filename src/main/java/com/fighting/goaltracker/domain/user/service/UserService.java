@@ -12,6 +12,7 @@ import com.fighting.goaltracker.domain.todo.repository.TodoRepository;
 import com.fighting.goaltracker.domain.routine.repository.RoutineRepository;
 import com.fighting.goaltracker.domain.record.repository.RoutineRecordRepository;
 import com.fighting.goaltracker.domain.goal.repository.GoalRepository;
+import com.fighting.goaltracker.domain.notification.repository.NotificationRepository;
 
 @Service
 public class UserService {
@@ -30,6 +31,9 @@ public class UserService {
 
     @Autowired
     private GoalRepository goalRepository;
+
+    @Autowired
+    private NotificationRepository notificationRepository;
 
     // 비밀번호 암호화 도구
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -107,6 +111,7 @@ public class UserService {
     public void deleteUser(Integer userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        notificationRepository.deleteByUser_UserId(userId);
         goalRepository.deleteByUser_UserId(userId);
         routineRecordRepository.deleteByUser_UserId(userId);
         routineRepository.deleteByUser_UserId(userId);

@@ -52,8 +52,8 @@ public class TodoService {
 
         // 투두 완료 상태 변경 (토글)
         @Transactional
-        public TodoResponseDto toggleComplete(Integer id) {
-                Todo todo = todoRepository.findById(id)
+        public TodoResponseDto toggleComplete(Integer id, Integer userId) {
+                Todo todo = todoRepository.findByTodoIdAndUser_UserId(id, userId)
                                 .orElseThrow(() -> new IllegalArgumentException("해당 투두를 찾을 수 없습니다."));
 
                 todo.toggleComplete();
@@ -62,8 +62,8 @@ public class TodoService {
 
         // 투두 내용 수정
         @Transactional
-        public TodoResponseDto updateTodo(Integer id, TodoRequestDto request) {
-                Todo todo = todoRepository.findById(id)
+        public TodoResponseDto updateTodo(Integer id, Integer userId, TodoRequestDto request) {
+                Todo todo = todoRepository.findByTodoIdAndUser_UserId(id, userId)
                                 .orElseThrow(() -> new IllegalArgumentException("해당 투두를 찾을 수 없습니다."));
 
                 todo.update(request.getTitle(), request.getDescription(),
@@ -74,8 +74,8 @@ public class TodoService {
 
         // 투두 삭제
         @Transactional
-        public String deleteTodo(Integer id) {
-                Todo todo = todoRepository.findById(id)
+        public String deleteTodo(Integer id, Integer userId) {
+                Todo todo = todoRepository.findByTodoIdAndUser_UserId(id, userId)
                                 .orElseThrow(() -> new IllegalArgumentException("해당 투두를 찾을 수 없습니다."));
 
                 String title = todo.getTitle();

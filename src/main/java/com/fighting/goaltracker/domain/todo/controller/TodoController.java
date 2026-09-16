@@ -39,28 +39,25 @@ public class TodoController {
     }
 
     // 투두 완료 상태 변경
-    @Operation(summary = "투두 완료 상태 변경(토글)", description = "투두의 고유 ID를 이용해 완료 여부(true/false) 상태 반전")
     @PatchMapping("/{id}/complete")
     public TodoResponseDto toggleComplete(@PathVariable("id") Integer id, HttpServletRequest request) {
         Integer userId = (Integer) request.getAttribute("userId");
-        return todoService.toggleComplete(id);
+        return todoService.toggleComplete(id, userId);
     }
 
     // 투두 내용 수정
-    @Operation(summary = "투두 내용 수정", description = "투두의 고유 ID를 이용해 할 일 내용 및 상세정보 수정")
     @PutMapping("/{id}")
     public TodoResponseDto updateTodo(@PathVariable("id") Integer id, @RequestBody TodoRequestDto request,
             HttpServletRequest httpRequest) {
         Integer userId = (Integer) httpRequest.getAttribute("userId");
-        return todoService.updateTodo(id, request);
+        return todoService.updateTodo(id, userId, request);
     }
 
     // 투두 삭제
-    @Operation(summary = "투두 삭제", description = "투두의 고유 ID를 이용해 해당 할 일 항목 삭제")
     @DeleteMapping("/{id}")
     public String deleteTodo(@PathVariable("id") Integer id, HttpServletRequest request) {
         Integer userId = (Integer) request.getAttribute("userId");
-        String title = todoService.deleteTodo(id);
+        String title = todoService.deleteTodo(id, userId);
         return "\"" + title + "\" 일정이 성공적으로 삭제되었습니다.";
     }
 }

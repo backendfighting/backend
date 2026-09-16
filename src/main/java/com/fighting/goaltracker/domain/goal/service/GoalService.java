@@ -1,5 +1,6 @@
 package com.fighting.goaltracker.domain.goal.service;
 
+import com.fighting.goaltracker.domain.goal.dto.GoalCompleteRequestDto;
 import com.fighting.goaltracker.domain.goal.dto.GoalRequestDto;
 import com.fighting.goaltracker.domain.goal.entity.Goal;
 import com.fighting.goaltracker.domain.goal.repository.GoalRepository;
@@ -44,12 +45,35 @@ public class GoalService {
         @Transactional(readOnly = true)
         public List<Goal> getGoalsByUser(Integer userId) {
                 return goalRepository.findByUser_UserId(userId);
+
+        }
+
+        // 목표 완료 처리
+        @Transactional
+        public Goal completeGoal(Integer goalId, Integer userId, GoalCompleteRequestDto request) {
+                Goal goal = goalRepository.findByGoalIdAndUser_UserId(goalId, userId)
+                                .orElseThrow(() -> new IllegalArgumentException("해당 목표를 찾을 수 없습니다."));
+                String status = request.getStatus();
+
+                if (status == null || (!status.equals("성공") && !status.equals("실패"))) {
+                        throw new IllegalArgumentException("status는 '성공' 또는 '실패'만 가능합니다.");
+                }
+
+                // 실패일 때는 원인 필수 선택
+                if (status.equals("실패") && (request.getReason() == null || request.getReason().trim().isEmpty())) {
+                        throw new IllegalArgumentException("실패 원인을 입력해주세요.");
+                }
+
+                goal.setStatus(status);
+                goal.setReason(status.equals("실패") ? request.getReason() : null);
+
+                return goalRepository.save(goal);
         }
 
         // 목표 수정
         @Transactional
-        public Goal updateGoal(Integer goalId, GoalRequestDto request) {
-                Goal goal = goalRepository.findById(goalId)
+        public Goal updateGoal(Integer goalId, Integer userId, GoalRequestDto request) {
+                Goal goal = goalRepository.findByGoalIdAndUser_UserId(goalId, userId)
                                 .orElseThrow(() -> new IllegalArgumentException("해당 목표를 찾을 수 없습니다."));
 
                 goal.update(request.getTitle(), request.getCategory(), request.getDescription(),
@@ -61,8 +85,8 @@ public class GoalService {
 
         // 목표 삭제
         @Transactional
-        public void deleteGoal(Integer goalId) {
-                Goal goal = goalRepository.findById(goalId)
+        public void deleteGoal(Integer goalId, Integer userId) {
+                Goal goal = goalRepository.findByGoalIdAndUser_UserId(goalId, userId)
                                 .orElseThrow(() -> new IllegalArgumentException("해당 목표를 찾을 수 없습니다."));
                 goalRepository.delete(goal);
         }

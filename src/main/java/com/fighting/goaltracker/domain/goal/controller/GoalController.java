@@ -1,5 +1,6 @@
 package com.fighting.goaltracker.domain.goal.controller;
 
+import com.fighting.goaltracker.domain.goal.dto.GoalCompleteRequestDto;
 import com.fighting.goaltracker.domain.goal.dto.GoalRequestDto;
 import com.fighting.goaltracker.domain.goal.dto.GoalResponseDto;
 import com.fighting.goaltracker.domain.goal.service.GoalService;
@@ -39,18 +40,30 @@ public class GoalController {
                 .collect(Collectors.toList());
     }
 
+    // 목표 완료 처리 (PATCH /api/goals/{goalId}/complete)
+    @Operation(summary = "목표 완료 처리", description = "목표를 성공 또는 실패로 처리. 실패 시 원인 필수 입력")
+    @PatchMapping("/{goalId}/complete")
+    public GoalResponseDto completeGoal(@PathVariable("goalId") Integer goalId,
+            @RequestBody GoalCompleteRequestDto request, HttpServletRequest httpRequest) {
+        Integer userId = (Integer) httpRequest.getAttribute("userId");
+        return new GoalResponseDto(goalService.completeGoal(goalId, userId, request));
+    }
+
     // 목표 수정 (PUT /api/goals/{goalId})
     @Operation(summary = "목표 수정", description = "목표 고유 ID를 이용해 목표 정보 수정")
     @PutMapping("/{goalId}")
-    public GoalResponseDto updateGoal(@PathVariable("goalId") Integer goalId, @RequestBody GoalRequestDto request) {
-        return new GoalResponseDto(goalService.updateGoal(goalId, request));
+    public GoalResponseDto updateGoal(@PathVariable("goalId") Integer goalId,
+            @RequestBody GoalRequestDto request, HttpServletRequest httpRequest) {
+        Integer userId = (Integer) httpRequest.getAttribute("userId");
+        return new GoalResponseDto(goalService.updateGoal(goalId, userId, request));
     }
 
     // 목표 삭제 (DELETE /api/goals/{goalId})
     @Operation(summary = "목표 삭제", description = "목표 고유 ID를 이용해 목표 삭제")
     @DeleteMapping("/{goalId}")
-    public String deleteGoal(@PathVariable("goalId") Integer goalId) {
-        goalService.deleteGoal(goalId);
+    public String deleteGoal(@PathVariable("goalId") Integer goalId, HttpServletRequest request) {
+        Integer userId = (Integer) request.getAttribute("userId");
+        goalService.deleteGoal(goalId, userId);
         return "목표가 성공적으로 삭제되었습니다.";
     }
 }

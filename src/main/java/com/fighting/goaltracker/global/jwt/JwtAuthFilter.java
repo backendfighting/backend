@@ -22,7 +22,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
-        // 로그인, 회원가입, Swagger는 토큰 검증 없이 통과
         if (path.equals("/api/users/login") || path.equals("/api/users/signup")
                 || path.startsWith("/swagger-ui") || path.startsWith("/v3/api-docs")) {
             filterChain.doFilter(request, response);

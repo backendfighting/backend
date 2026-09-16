@@ -17,7 +17,7 @@ public class GoalResponseDto {
     private String reason;
 
     public GoalResponseDto(Goal goal) {
-        this.goalId = goal.getId();
+        this.goalId = goal.getGoalId();
         this.title = goal.getTitle();
         this.category = goal.getCategory();
         this.description = goal.getDescription();
