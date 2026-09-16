@@ -2,17 +2,17 @@ package com.fighting.goaltracker.domain.routine.controller;
 
 import com.fighting.goaltracker.domain.routine.dto.RoutineRequestDto;
 import com.fighting.goaltracker.domain.routine.dto.RoutineResponseDto;
+
 import com.fighting.goaltracker.domain.routine.entity.Routine;
 import com.fighting.goaltracker.domain.routine.service.RoutineService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.List; // 오타(a) 수정됨
+import java.util.List;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 
 @Tag(name = "루틴(Routine)", description = "루틴 생성, 조회, 수정 및 삭제 관련 API")
 @RestController
@@ -27,8 +27,6 @@ public class RoutineController {
     @PostMapping
     public RoutineResponseDto createRoutine(@RequestBody RoutineRequestDto request, HttpServletRequest httpRequest) {
         Integer userId = (Integer) httpRequest.getAttribute("userId");
-        if (userId == null)
-            throw new IllegalArgumentException("로그인이 필요합니다.");
         Routine routine = new Routine();
         routine.setTitle(request.getTitle());
         routine.setDescription(request.getDescription());
@@ -44,8 +42,6 @@ public class RoutineController {
             @RequestParam("date") LocalDate date,
             HttpServletRequest request) {
         Integer userId = (Integer) request.getAttribute("userId");
-        if (userId == null)
-            throw new IllegalArgumentException("로그인이 필요합니다.");
         return routineService.getRoutinesByDate(userId, date)
                 .stream()
                 .map(RoutineResponseDto::new)
@@ -57,9 +53,7 @@ public class RoutineController {
     @GetMapping("/{routineId}")
     public RoutineResponseDto getRoutineById(@PathVariable("routineId") Integer routineId, HttpServletRequest request) {
         Integer userId = (Integer) request.getAttribute("userId");
-        if (userId == null)
-            throw new IllegalArgumentException("로그인이 필요합니다.");
-        return new RoutineResponseDto(routineService.getRoutineById(routineId));
+        return new RoutineResponseDto(routineService.getRoutineById(routineId, userId));
     }
 
     // 루틴 수정
@@ -68,14 +62,12 @@ public class RoutineController {
     public RoutineResponseDto updateRoutine(@PathVariable("routineId") Integer routineId,
             @RequestBody RoutineRequestDto request, HttpServletRequest httpRequest) {
         Integer userId = (Integer) httpRequest.getAttribute("userId");
-        if (userId == null)
-            throw new IllegalArgumentException("로그인이 필요합니다.");
         Routine routineDetails = new Routine();
         routineDetails.setTitle(request.getTitle());
         routineDetails.setDescription(request.getDescription());
         routineDetails.setCategory(request.getCategory());
         routineDetails.setRepeatDays(request.getRepeatDays());
-        return new RoutineResponseDto(routineService.updateRoutine(routineId, routineDetails));
+        return new RoutineResponseDto(routineService.updateRoutine(routineId, userId, routineDetails));
     }
 
     // 루틴 활성화/비활성화 토글
@@ -84,20 +76,13 @@ public class RoutineController {
     public RoutineResponseDto toggleRoutineActive(@PathVariable("routineId") Integer routineId,
             HttpServletRequest request) {
         Integer userId = (Integer) request.getAttribute("userId");
-        if (userId == null)
-            throw new IllegalArgumentException("로그인이 필요합니다.");
-        return new RoutineResponseDto(routineService.toggleRoutineActive(routineId));
+        return new RoutineResponseDto(routineService.toggleRoutineActive(routineId, userId));
     }
 
-    // 루틴 삭제 (클래스 내부로 정상 위치시킴)
-    @Operation(summary = "루틴 삭제", description = "루틴 고유 ID를 이용하여 루틴을 삭제")
+    // 루틴 삭제
     @DeleteMapping("/{routineId}")
     public void deleteRoutine(@PathVariable("routineId") Integer routineId, HttpServletRequest request) {
         Integer userId = (Integer) request.getAttribute("userId");
-        if (userId == null)
-            throw new IllegalArgumentException("로그인이 필요합니다.");
-            
-        // RoutineService에 deleteRoutine 메서드가 있어야 작동합니다.
-        routineService.deleteRoutine(routineId); 
+        routineService.deleteRoutine(routineId, userId);
     }
 }

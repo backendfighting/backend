@@ -10,14 +10,14 @@ public class NotificationResponseDto {
     private Integer notificationId;
     private String type;
     private String message;
-    private boolean isRead;
+    private boolean read;
     private LocalDateTime createdAt;
 
     public NotificationResponseDto(Notification notification) {
         this.notificationId = notification.getNotificationId();
         this.type = notification.getType();
         this.message = notification.getMessage();
-        this.isRead = notification.isRead();
+        this.read = notification.isRead();
         this.createdAt = notification.getCreatedAt();
     }
 }

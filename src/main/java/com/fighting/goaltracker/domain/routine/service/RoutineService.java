@@ -1,8 +1,8 @@
 package com.fighting.goaltracker.domain.routine.service;
 
-import com.fighting.goaltracker.domain.record.repository.RoutineRecordRepository;
 import com.fighting.goaltracker.domain.routine.entity.Routine;
 import com.fighting.goaltracker.domain.routine.repository.RoutineRepository;
+import com.fighting.goaltracker.domain.record.repository.RoutineRecordRepository;
 import com.fighting.goaltracker.domain.user.entity.User;
 import com.fighting.goaltracker.domain.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,10 +20,10 @@ public class RoutineService {
     private RoutineRepository routineRepository;
 
     @Autowired
-    private RoutineRecordRepository routineRecordRepository;
+    private UserRepository userRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private RoutineRecordRepository routineRecordRepository;
 
     // 루틴 생성
     @Transactional
@@ -48,54 +48,46 @@ public class RoutineService {
         return routineRepository.findActiveRoutinesByDay(userId, dayOfWeek);
     }
 
-    // 루틴 상세 조회 로직
+    // 루틴 상세 조회
     @Transactional(readOnly = true)
-    public Routine getRoutineById(Integer routineId) {
-        return routineRepository.findById(routineId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 루틴이 존재하지 않습니다. ID: " + routineId));
+    public Routine getRoutineById(Integer routineId, Integer userId) {
+        return routineRepository.findByRoutineIdAndUser_UserId(routineId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 루틴이 존재하지 않습니다."));
     }
 
-    // 루틴 수정 로직
+    // 루틴 수정
     @Transactional
-    public Routine updateRoutine(Integer routineId, Routine routineDetails) {
-        Routine existingRoutine = routineRepository.findById(routineId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 루틴입니다."));
+    public Routine updateRoutine(Integer routineId, Integer userId, Routine routineDetails) {
+        Routine existingRoutine = routineRepository.findByRoutineIdAndUser_UserId(routineId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 루틴이 존재하지 않습니다."));
 
-        if (routineDetails.getTitle() != null) {
+        if (routineDetails.getTitle() != null)
             existingRoutine.setTitle(routineDetails.getTitle());
-        }
-
-        if (routineDetails.getDescription() != null) {
+        if (routineDetails.getDescription() != null)
             existingRoutine.setDescription(routineDetails.getDescription());
-        }
-
-        if (routineDetails.getCategory() != null) {
+        if (routineDetails.getCategory() != null)
             existingRoutine.setCategory(routineDetails.getCategory());
-        }
-
-        if (routineDetails.getRepeatDays() != null) {
+        if (routineDetails.getRepeatDays() != null)
             existingRoutine.setRepeatDays(routineDetails.getRepeatDays());
-        }
 
         return routineRepository.save(existingRoutine);
     }
 
-    // 루틴 켜고 끄기 (is_active 토글 스위치)
+    // 루틴 켜고 끄기
     @Transactional
-    public Routine toggleRoutineActive(Integer routineId) {
-        Routine routine = routineRepository.findById(routineId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 루틴을 찾을 수 없습니다."));
+    public Routine toggleRoutineActive(Integer routineId, Integer userId) {
+        Routine routine = routineRepository.findByRoutineIdAndUser_UserId(routineId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 루틴이 존재하지 않습니다."));
 
         routine.setActive(!routine.isActive());
-
         return routineRepository.save(routine);
     }
 
-    // 루틴 완전 삭제 (DB에서 제거) - 새로 추가된 부분!
+    // 루틴 삭제
     @Transactional
-    public void deleteRoutine(Integer routineId) {
-        Routine routine = routineRepository.findById(routineId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 루틴을 찾을 수 없습니다. ID: " + routineId));
+    public void deleteRoutine(Integer routineId, Integer userId) {
+        Routine routine = routineRepository.findByRoutineIdAndUser_UserId(routineId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 루틴이 존재하지 않습니다."));
 
         routineRecordRepository.deleteByRoutine_RoutineId(routineId);
         routineRepository.delete(routine);
