@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import java.time.LocalDate;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "goals")
@@ -35,9 +38,16 @@ public class Goal {
     private String status = "진행중";
     private String reason;
 
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
     public void update(String title, String category, String description,
-            LocalDate startDate, LocalDate endDate,
-            Integer progress, String status, String reason) {
+            LocalDate startDate, LocalDate endDate) {
         if (title != null)
             this.title = title;
         if (category != null)
@@ -48,11 +58,5 @@ public class Goal {
             this.startDate = startDate;
         if (endDate != null)
             this.endDate = endDate;
-        if (progress != null)
-            this.progress = progress;
-        if (status != null)
-            this.status = status;
-        if (reason != null)
-            this.reason = reason;
     }
 }

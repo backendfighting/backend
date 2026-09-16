@@ -3,6 +3,8 @@ package com.fighting.goaltracker.domain.goal.dto;
 import com.fighting.goaltracker.domain.goal.entity.Goal;
 import lombok.Getter;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalDateTime;
 
 @Getter
 public class GoalResponseDto {
@@ -15,6 +17,8 @@ public class GoalResponseDto {
     private Integer progress;
     private String status;
     private String reason;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     public GoalResponseDto(Goal goal) {
         this.goalId = goal.getGoalId();
@@ -26,5 +30,7 @@ public class GoalResponseDto {
         this.progress = goal.getProgress();
         this.status = goal.getStatus();
         this.reason = goal.getReason();
+        this.createdAt = goal.getCreatedAt();
+        this.updatedAt = goal.getUpdatedAt();
     }
 }

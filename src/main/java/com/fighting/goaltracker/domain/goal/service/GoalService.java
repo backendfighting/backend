@@ -34,9 +34,7 @@ public class GoalService {
                 goal.setDescription(request.getDescription());
                 goal.setStartDate(request.getStartDate());
                 goal.setEndDate(request.getEndDate());
-                goal.setProgress(request.getProgress() != null ? request.getProgress() : 0);
-                goal.setStatus(request.getStatus() != null ? request.getStatus() : "진행중");
-                goal.setReason(request.getReason());
+                // progress, status는 Goal 엔티티의 기본값(0, "진행중") 그대로 사용
 
                 return goalRepository.save(goal);
         }
@@ -77,8 +75,7 @@ public class GoalService {
                                 .orElseThrow(() -> new IllegalArgumentException("해당 목표를 찾을 수 없습니다."));
 
                 goal.update(request.getTitle(), request.getCategory(), request.getDescription(),
-                                request.getStartDate(), request.getEndDate(),
-                                request.getProgress(), request.getStatus(), request.getReason());
+                                request.getStartDate(), request.getEndDate());
 
                 return goalRepository.save(goal);
         }

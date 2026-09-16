@@ -12,7 +12,4 @@ public class GoalRequestDto {
     private String description;
     private LocalDate startDate;
     private LocalDate endDate;
-    private Integer progress;
-    private String status;
-    private String reason;
 }
