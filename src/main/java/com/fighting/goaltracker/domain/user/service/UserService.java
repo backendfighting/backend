@@ -84,6 +84,12 @@ public class UserService {
             user.setName(updateRequest.getName());
         }
         if (updateRequest.getEmail() != null) {
+            // 이미 사용 중인 이메일로 변경 시도 차단
+            userRepository.findByEmail(updateRequest.getEmail())
+                    .filter(existing -> !existing.getUserId().equals(currentUserId))
+                    .ifPresent(existing -> {
+                        throw new IllegalArgumentException("이미 사용 중인 이메일 주소입니다.");
+                    });
             user.setEmail(updateRequest.getEmail());
         }
 
