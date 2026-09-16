@@ -43,7 +43,6 @@ public class GoalService {
         @Transactional(readOnly = true)
         public List<Goal> getGoalsByUser(Integer userId) {
                 return goalRepository.findByUser_UserId(userId);
-
         }
 
         // 목표 완료 처리
@@ -51,13 +50,15 @@ public class GoalService {
         public Goal completeGoal(Integer goalId, Integer userId, GoalCompleteRequestDto request) {
                 Goal goal = goalRepository.findByGoalIdAndUser_UserId(goalId, userId)
                                 .orElseThrow(() -> new IllegalArgumentException("해당 목표를 찾을 수 없습니다."));
+
                 String status = request.getStatus();
 
+                // status 값 검증
                 if (status == null || (!status.equals("성공") && !status.equals("실패"))) {
                         throw new IllegalArgumentException("status는 '성공' 또는 '실패'만 가능합니다.");
                 }
 
-                // 실패일 때는 원인 필수 선택
+                // 실패일 때는 원인 필수
                 if (status.equals("실패") && (request.getReason() == null || request.getReason().trim().isEmpty())) {
                         throw new IllegalArgumentException("실패 원인을 입력해주세요.");
                 }

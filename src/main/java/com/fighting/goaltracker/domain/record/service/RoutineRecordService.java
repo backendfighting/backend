@@ -28,17 +28,16 @@ public class RoutineRecordService {
     public void toggleRoutineCheck(Integer userId, Integer routineId, String dateStr) {
         LocalDate recordDate = LocalDate.parse(dateStr);
 
+        // 이 루틴이 요청자 소유인지 먼저 확인
+        Routine routine = routineRepository.findByRoutineIdAndUser_UserId(routineId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 루틴을 찾을 수 없습니다."));
+
         Optional<RoutineRecord> existingRecord = routineRecordRepository
                 .findByRoutine_RoutineIdAndRecordDate(routineId, recordDate);
 
         if (existingRecord.isPresent()) {
-            // 이미 기록이 존재한다면 -> 체크 해제 요청이므로 기록을 삭제
             routineRecordRepository.delete(existingRecord.get());
         } else {
-            // 기록이 없다면 -> 새롭게 완료 처리
-            Routine routine = routineRepository.findById(routineId)
-                    .orElseThrow(() -> new IllegalArgumentException("해당 루틴을 찾을 수 없습니다."));
-
             User user = routine.getUser();
 
             RoutineRecord record = new RoutineRecord();

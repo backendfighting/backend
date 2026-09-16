@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.time.DayOfWeek;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RoutineRepository extends JpaRepository<Routine, Integer> {
@@ -22,4 +23,6 @@ public interface RoutineRepository extends JpaRepository<Routine, Integer> {
     List<Routine> findByUser_UserIdAndTitle(Integer userId, String title);
 
     void deleteByUser_UserId(Integer userId);
+
+    Optional<Routine> findByRoutineIdAndUser_UserId(Integer routineId, Integer userId);
 }

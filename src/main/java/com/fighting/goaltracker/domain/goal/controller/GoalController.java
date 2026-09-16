@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Tag(name = "목표(Goal)", description = "목표 생성, 조회 관련 API")
+@Tag(name = "목표(Goal)", description = "목표 생성, 조회, 수정, 삭제 및 완료 처리 관련 API")
 @RestController
 @RequestMapping("/api/goals")
 public class GoalController {

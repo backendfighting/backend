@@ -29,8 +29,9 @@ public class NotificationController {
     // 알림 읽음 처리
     @Operation(summary = "알림 읽음 처리", description = "특정 알림을 읽음 상태로 변경")
     @PatchMapping("/{id}/read")
-    public String markAsRead(@PathVariable("id") Integer id) {
-        notificationService.markAsRead(id);
+    public String markAsRead(@PathVariable("id") Integer id, HttpServletRequest request) {
+        Integer userId = (Integer) request.getAttribute("userId");
+        notificationService.markAsRead(id, userId);
         return "읽음 처리되었습니다.";
     }
 }
