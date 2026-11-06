@@ -31,7 +31,6 @@ public class RoutineService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
 
-        // ✨ 발표 데모 및 프론트 연동 최적화: 유효 카테고리 허용 범위 확장
         if (routine.getCategory() == null || routine.getCategory().isEmpty()) {
             routine.setCategory("기타");
         }
@@ -39,6 +38,12 @@ public class RoutineService {
         routine.setUser(user);
         routine.setActive(true);
         return routineRepository.save(routine);
+    }
+
+    // 특정 유저의 모든 루틴 조회 (일시중지된 루틴 포함)
+    @Transactional(readOnly = true)
+    public List<Routine> getAllRoutines(Integer userId) {
+        return routineRepository.findByUser_UserId(userId);
     }
 
     // 특정 유저의 오늘 해야 하는 활성화된 루틴 목록 조회

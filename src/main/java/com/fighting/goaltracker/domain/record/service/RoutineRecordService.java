@@ -56,4 +56,10 @@ public class RoutineRecordService {
     public List<RoutineRecord> getRecordsByDate(Integer userId, LocalDate date) {
         return routineRecordRepository.findByUser_UserIdAndRecordDate(userId, date);
     }
+
+    // 기간 내 루틴 달성 기록 목록 조회 (통계 화면용)
+    @Transactional(readOnly = true)
+    public List<RoutineRecord> getRecordsBetween(Integer userId, LocalDate start, LocalDate end) {
+        return routineRecordRepository.findByUser_UserIdAndRecordDateBetween(userId, start, end);
+    }
 }

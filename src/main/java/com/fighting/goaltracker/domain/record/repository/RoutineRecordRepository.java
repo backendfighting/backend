@@ -14,6 +14,9 @@ public interface RoutineRecordRepository extends JpaRepository<RoutineRecord, In
     // 특정 유저의 특정 날짜 루틴 기록 전체 조회
     List<RoutineRecord> findByUser_UserIdAndRecordDate(Integer userId, LocalDate recordDate);
 
+    // 특정 유저의 기간 내 루틴 기록 전체 조회 (통계용)
+    List<RoutineRecord> findByUser_UserIdAndRecordDateBetween(Integer userId, LocalDate start, LocalDate end);
+
     // 특정 루틴이 특정 날짜에 이미 체크되었는지 확인하기 위한 용도
     Optional<RoutineRecord> findByRoutine_RoutineIdAndRecordDate(Integer routineId, LocalDate recordDate);
 

@@ -35,6 +35,17 @@ public class RoutineController {
         return new RoutineResponseDto(routineService.createRoutine(userId, routine));
     }
 
+    // 내 루틴 전체 조회 (일시중지된 루틴 포함)
+    @Operation(summary = "내 루틴 전체 조회", description = "일시중지된 루틴을 포함해 로그인한 유저의 모든 루틴 조회")
+    @GetMapping
+    public List<RoutineResponseDto> getAllRoutines(HttpServletRequest request) {
+        Integer userId = (Integer) request.getAttribute("userId");
+        return routineService.getAllRoutines(userId)
+                .stream()
+                .map(RoutineResponseDto::new)
+                .collect(java.util.stream.Collectors.toList());
+    }
+
     // 날짜별 루틴 목록 조회
     @Operation(summary = "날짜별 루틴 목록 조회", description = "특정 날짜의 루틴 목록 조회")
     @GetMapping("/list")

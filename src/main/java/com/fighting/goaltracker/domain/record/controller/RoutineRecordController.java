@@ -8,7 +8,6 @@ import java.util.List;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 
 @Tag(name = "루틴 기록 (Record)", description = "날짜별 루틴 달성 여부 체크 및 기록 조회 기능")
 @RestController
@@ -26,8 +25,6 @@ public class RoutineRecordController {
             @RequestParam("date") String dateStr,
             HttpServletRequest request) {
         Integer userId = (Integer) request.getAttribute("userId");
-        if (userId == null)
-            throw new IllegalArgumentException("로그인이 필요합니다.");
         routineRecordService.toggleRoutineCheck(userId, routineId, dateStr);
     }
 
@@ -38,9 +35,23 @@ public class RoutineRecordController {
             @RequestParam("date") @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate date,
             HttpServletRequest request) {
         Integer userId = (Integer) request.getAttribute("userId");
+        return routineRecordService.getRecordsByDate(userId, date)
+                .stream()
+                .map(RoutineRecordResponseDto::new)
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    // 기간별 루틴 달성 기록 조회 (통계용)
+    @Operation(summary = "기간별 루틴 달성 기록 조회", description = "시작일부터 종료일까지의 루틴 달성 기록 목록 조회 (통계 화면용)")
+    @GetMapping("/range")
+    public List<RoutineRecordResponseDto> getRecordsByRange(
+            @RequestParam("start") @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate start,
+            @RequestParam("end") @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate end,
+            HttpServletRequest request) {
+        Integer userId = (Integer) request.getAttribute("userId");
         if (userId == null)
             throw new IllegalArgumentException("로그인이 필요합니다.");
-        return routineRecordService.getRecordsByDate(userId, date)
+        return routineRecordService.getRecordsBetween(userId, start, end)
                 .stream()
                 .map(RoutineRecordResponseDto::new)
                 .collect(java.util.stream.Collectors.toList());
