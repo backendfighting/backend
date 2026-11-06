@@ -76,7 +76,7 @@ public class GoalService {
                                 .orElseThrow(() -> new IllegalArgumentException("해당 목표를 찾을 수 없습니다."));
 
                 goal.update(request.getTitle(), request.getCategory(), request.getDescription(),
-                                request.getStartDate(), request.getEndDate());
+                                request.getStartDate(), request.getEndDate(), request.getProgress());
 
                 return goalRepository.save(goal);
         }

@@ -47,7 +47,7 @@ public class Goal {
     private LocalDateTime updatedAt;
 
     public void update(String title, String category, String description,
-            LocalDate startDate, LocalDate endDate) {
+            LocalDate startDate, LocalDate endDate, Integer progress) {
         if (title != null)
             this.title = title;
         if (category != null)
@@ -58,5 +58,7 @@ public class Goal {
             this.startDate = startDate;
         if (endDate != null)
             this.endDate = endDate;
+        if (progress != null)
+            this.progress = progress;
     }
 }
