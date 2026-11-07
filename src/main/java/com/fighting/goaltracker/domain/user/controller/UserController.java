@@ -5,6 +5,9 @@ import com.fighting.goaltracker.domain.user.dto.SignupRequestDto;
 import com.fighting.goaltracker.domain.user.dto.UserResponseDto;
 import com.fighting.goaltracker.domain.user.dto.UpdateProfileRequestDto;
 import com.fighting.goaltracker.domain.user.dto.UpdatePasswordRequestDto;
+import com.fighting.goaltracker.domain.user.dto.MissionAlarmRequestDto;
+import com.fighting.goaltracker.domain.user.dto.AlarmSettingsRequestDto;
+import com.fighting.goaltracker.domain.user.dto.WithdrawRequestDto;
 
 import com.fighting.goaltracker.domain.user.entity.User;
 import com.fighting.goaltracker.domain.user.service.UserService;
@@ -79,12 +82,31 @@ public class UserController {
         return "비밀번호가 성공적으로 변경되었습니다.";
     }
 
-    // 회원 탈퇴 (DELETE /api/users/me)
-    @Operation(summary = "회원 탈퇴", description = "현재 로그인한 유저의 계정 및 모든 데이터 삭제")
+    // 오늘의 미션 알림 시간 변경 (PUT /api/users/me/alarm-times)
+    @Operation(summary = "오늘의 미션 알림 시간 변경", description = "times에 \"HH:mm\" 목록을 보내면 저장. 빈 목록이면 알림 끄기")
+    @PutMapping("/me/alarm-times")
+    public UserResponseDto updateMissionAlarmTimes(@RequestBody MissionAlarmRequestDto request,
+            HttpServletRequest httpRequest) {
+        Integer currentUserId = (Integer) httpRequest.getAttribute("userId");
+        return new UserResponseDto(userService.updateMissionAlarmTimes(currentUserId, request.getTimes()));
+    }
+
+    // 알림 설정 변경 (PATCH /api/users/me/alarm-settings) - 보낸 항목만 바뀜
+    @Operation(summary = "알림 설정 변경", description = "기기 알림(전체 스위치), 오늘의 미션/목표 리마인더 알림 켜기·끄기, 오늘의 미션 알림 시간, 목표 리마인더 시간. 보낸 항목만 변경")
+    @PatchMapping("/me/alarm-settings")
+    public UserResponseDto updateAlarmSettings(@RequestBody AlarmSettingsRequestDto request,
+            HttpServletRequest httpRequest) {
+        Integer currentUserId = (Integer) httpRequest.getAttribute("userId");
+        return new UserResponseDto(userService.updateAlarmSettings(currentUserId, request));
+    }
+
+    // 회원 탈퇴 (DELETE /api/users/me, body: {"password": "..."})
+    // 비밀번호가 맞을 때만 계정과 모든 데이터를 삭제한다
+    @Operation(summary = "회원 탈퇴", description = "비밀번호 확인 후 현재 로그인한 유저의 계정 및 모든 데이터 삭제")
     @DeleteMapping("/me")
-    public String deleteUser(HttpServletRequest request) {
+    public String deleteUser(@RequestBody(required = false) WithdrawRequestDto body, HttpServletRequest request) {
         Integer userId = (Integer) request.getAttribute("userId");
-        userService.deleteUser(userId);
+        userService.deleteUser(userId, body == null ? null : body.getPassword());
         return "회원 탈퇴가 완료되었습니다.";
     }
 }

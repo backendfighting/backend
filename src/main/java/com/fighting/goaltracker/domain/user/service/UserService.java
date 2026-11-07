@@ -1,5 +1,6 @@
 package com.fighting.goaltracker.domain.user.service;
 
+import com.fighting.goaltracker.domain.user.dto.AlarmSettingsRequestDto;
 import com.fighting.goaltracker.domain.user.entity.User;
 import com.fighting.goaltracker.domain.user.repository.UserRepository;
 import com.fighting.goaltracker.domain.user.dto.UpdateProfileRequestDto;
@@ -7,6 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.TreeSet;
 
 import com.fighting.goaltracker.domain.todo.repository.TodoRepository;
 import com.fighting.goaltracker.domain.routine.repository.RoutineRepository;
@@ -112,11 +116,83 @@ public class UserService {
         userRepository.save(user);
     }
 
-    // 회원 탈퇴 (회원 정보 삭제)
+    // 오늘의 미션 알림 시간 변경 ("HH:mm" 목록, 빈 목록이면 알림 끄기)
     @Transactional
-    public void deleteUser(Integer userId) {
+    public User updateMissionAlarmTimes(Integer userId, List<String> times) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        user.setMissionAlarmTimes(cleanAlarmTimes(times));
+        return userRepository.save(user);
+    }
+
+    // 알림 설정 변경 (보낸 항목만 반영)
+    @Transactional
+    public User updateAlarmSettings(Integer userId, AlarmSettingsRequestDto request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        if (request.getDeviceAlarmOn() != null) {
+            user.setDeviceAlarmOn(request.getDeviceAlarmOn());
+            // 처음 켤 때(오늘의 미션·목표 리마인더를 한 번도 정한 적 없을 때)는 둘 다 켠다.
+            // 그 뒤로는 껐다 켜도 이전에 정해둔 설정 그대로 돌아온다.
+            if (request.getDeviceAlarmOn() && user.getMissionAlarmOn() == null && user.getGoalAlarmOn() == null) {
+                user.setMissionAlarmOn(true);
+                user.setGoalAlarmOn(true);
+            }
+        }
+        if (request.getMissionAlarmOn() != null)
+            user.setMissionAlarmOn(request.getMissionAlarmOn());
+        if (request.getMissionAlarmTimes() != null)
+            user.setMissionAlarmTimes(cleanAlarmTimes(request.getMissionAlarmTimes()));
+        if (request.getTodoAlarmOn() != null)
+            user.setTodoAlarmOn(request.getTodoAlarmOn());
+        if (request.getRoutineAlarmOn() != null)
+            user.setRoutineAlarmOn(request.getRoutineAlarmOn());
+        if (request.getGoalAlarmOn() != null)
+            user.setGoalAlarmOn(request.getGoalAlarmOn());
+        if (request.getGoalAlarmTime() != null) {
+            if (!isHourMinute(request.getGoalAlarmTime()))
+                throw new IllegalArgumentException("목표 리마인더 시간 형식이 올바르지 않습니다: " + request.getGoalAlarmTime());
+            user.setGoalAlarmTime(request.getGoalAlarmTime());
+        }
+        return userRepository.save(user);
+    }
+
+    private boolean isHourMinute(String t) {
+        return t != null && t.matches("([01]\\d|2[0-3]):[0-5]\\d");
+    }
+
+    // "HH:mm" 목록 검사 + 중복 제거 + 시간순 정렬 -> "08:00,21:30"
+    private String cleanAlarmTimes(List<String> times) {
+        TreeSet<String> cleaned = new TreeSet<>();
+        if (times != null) {
+            for (String t : times) {
+                if (!isHourMinute(t)) {
+                    throw new IllegalArgumentException("알림 시간 형식이 올바르지 않습니다: " + t);
+                }
+                cleaned.add(t);
+            }
+        }
+        if (cleaned.size() > 10) {
+            throw new IllegalArgumentException("알림 시간은 10개까지 설정할 수 있습니다.");
+        }
+        return String.join(",", cleaned);
+    }
+
+    // 회원 탈퇴 (회원 정보 삭제)
+    @Transactional
+    public void deleteUser(Integer userId, String password) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        // 본인 확인: 비밀번호가 맞아야 탈퇴할 수 있음
+        if (password == null || password.isBlank()) {
+            throw new IllegalArgumentException("비밀번호를 입력해주세요.");
+        }
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
         notificationRepository.deleteByUser_UserId(userId);
         goalRepository.deleteByUser_UserId(userId);
         routineRecordRepository.deleteByUser_UserId(userId);
