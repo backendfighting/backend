@@ -45,6 +45,10 @@ public class Todo {
     @Column(name = "is_completed", nullable = false)
     private boolean isCompleted;
 
+    // 몇 분 전에 알림을 받을지 (비어 있으면 알림 없음, 0이면 시작 시간에)
+    @Column(name = "notify_before")
+    private Integer notifyBefore;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -52,6 +56,11 @@ public class Todo {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    // 알림 설정 변경 (null이면 알림 끄기)
+    public void changeNotifyBefore(Integer notifyBefore) {
+        this.notifyBefore = notifyBefore;
+    }
 
     public void toggleComplete() {
         this.isCompleted = !this.isCompleted;

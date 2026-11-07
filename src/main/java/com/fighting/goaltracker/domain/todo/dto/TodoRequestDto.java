@@ -13,4 +13,5 @@ public class TodoRequestDto {
     private LocalDate todoDate;
     private LocalTime todoTime;
     private String priority;
+    private Integer notifyBefore; // 몇 분 전 알림 (비우면 알림 없음)
 }

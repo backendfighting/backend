@@ -38,6 +38,17 @@ public class TodoController {
         return todoService.getTodosByDate(userId, date);
     }
 
+    // 기간별 투두 조회 (달력의 날짜별 달성률용)
+    @Operation(summary = "기간별 투두 조회", description = "start~end(포함) 사이의 투두를 모두 조회")
+    @GetMapping("/range")
+    public List<TodoResponseDto> getTodosByRange(
+            @RequestParam("start") LocalDate start,
+            @RequestParam("end") LocalDate end,
+            HttpServletRequest request) {
+        Integer userId = (Integer) request.getAttribute("userId");
+        return todoService.getTodosByRange(userId, start, end);
+    }
+
     // 투두 완료 상태 변경
     @PatchMapping("/{id}/complete")
     public TodoResponseDto toggleComplete(@PathVariable("id") Integer id, HttpServletRequest request) {

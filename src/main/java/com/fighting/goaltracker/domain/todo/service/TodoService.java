@@ -34,6 +34,7 @@ public class TodoService {
                                 .description(request.getDescription())
                                 .todoDate(request.getTodoDate())
                                 .todoTime(request.getTodoTime())
+                                .notifyBefore(request.getNotifyBefore())
                                 .priority(request.getPriority() != null ? request.getPriority() : "MEDIUM") // 기본값
                                                                                                             // MEDIUM
                                 .build();
@@ -42,6 +43,15 @@ public class TodoService {
         }
 
         // 날짜별 투두 조회
+        // 기간 안의 할 일 조회 (시작일~종료일 포함)
+        @Transactional(readOnly = true)
+        public List<TodoResponseDto> getTodosByRange(Integer userId, LocalDate start, LocalDate end) {
+                return todoRepository.findByUser_UserIdAndTodoDateBetween(userId, start, end)
+                                .stream()
+                                .map(TodoResponseDto::new)
+                                .collect(Collectors.toList());
+        }
+
         public List<TodoResponseDto> getTodosByDate(Integer userId, LocalDate date) {
                 List<Todo> todo = todoRepository.findByUser_UserIdAndTodoDate(userId, date);
 
@@ -68,6 +78,8 @@ public class TodoService {
 
                 todo.update(request.getTitle(), request.getDescription(),
                                 request.getTodoDate(), request.getTodoTime(), request.getPriority());
+                // 알림은 '끄기'도 가능해야 하므로 보낸 값 그대로 반영
+                todo.changeNotifyBefore(request.getNotifyBefore());
 
                 return new TodoResponseDto(todoRepository.save(todo));
         }

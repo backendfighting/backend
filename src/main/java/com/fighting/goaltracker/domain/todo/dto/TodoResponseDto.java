@@ -14,6 +14,7 @@ public class TodoResponseDto {
     private LocalTime todoTime;
     private String priority;
     private boolean completed;
+    private Integer notifyBefore;
 
     // Todo 엔티티를 TodoResponseDto로 변환하는 생성자
     public TodoResponseDto(Todo todo) {
@@ -24,5 +25,6 @@ public class TodoResponseDto {
         this.todoTime = todo.getTodoTime();
         this.priority = todo.getPriority();
         this.completed = todo.isCompleted();
+        this.notifyBefore = todo.getNotifyBefore();
     }
 }
