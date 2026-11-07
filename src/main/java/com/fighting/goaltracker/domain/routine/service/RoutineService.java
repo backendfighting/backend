@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class RoutineService {
@@ -31,12 +32,18 @@ public class RoutineService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
 
+        // ✨ 발표 데모 및 프론트 연동 최적화: 유효 카테고리 허용 범위 확장
         if (routine.getCategory() == null || routine.getCategory().isEmpty()) {
             routine.setCategory("기타");
         }
 
+        if (routine.getPriority() == null || routine.getPriority().isEmpty()) {
+            routine.setPriority("MEDIUM");
+        }
+
         routine.setUser(user);
         routine.setActive(true);
+        routine.setEndDate(null);
         return routineRepository.save(routine);
     }
 
@@ -50,7 +57,14 @@ public class RoutineService {
     @Transactional(readOnly = true)
     public List<Routine> getRoutinesByDate(Integer userId, LocalDate date) {
         DayOfWeek dayOfWeek = date.getDayOfWeek();
-        return routineRepository.findActiveRoutinesByDay(userId, dayOfWeek);
+        // 요일이 맞고, 시작일~종료일 사이이고, 그 날 쉬는 중이 아닌 루틴만 보이게 한다
+        // (지금은 일시정지 중이어도, 쉬기 전 날짜에는 그대로 보인다)
+        return routineRepository.findByUser_UserId(userId)
+                .stream()
+                .filter(routine -> routine.getRepeatDays() != null && routine.getRepeatDays().contains(dayOfWeek))
+                .filter(routine -> routine.appearsOn(date))
+                .filter(routine -> !routine.isPausedOn(date))
+                .collect(Collectors.toList());
     }
 
     // 루틴 상세 조회
@@ -74,6 +88,13 @@ public class RoutineService {
             existingRoutine.setCategory(routineDetails.getCategory());
         if (routineDetails.getRepeatDays() != null)
             existingRoutine.setRepeatDays(routineDetails.getRepeatDays());
+        if (routineDetails.getPriority() != null)
+            existingRoutine.setPriority(routineDetails.getPriority());
+
+        // 시작일·시간·알림은 '비우기'도 가능해야 하므로 보낸 값 그대로 덮어쓴다
+        existingRoutine.setStartDate(routineDetails.getStartDate());
+        existingRoutine.setRoutineTime(routineDetails.getRoutineTime());
+        existingRoutine.setNotifyBefore(routineDetails.getNotifyBefore());
 
         return routineRepository.save(existingRoutine);
     }
@@ -84,17 +105,34 @@ public class RoutineService {
         Routine routine = routineRepository.findByRoutineIdAndUser_UserId(routineId, userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 루틴이 존재하지 않습니다."));
 
-        routine.setActive(!routine.isActive());
+        LocalDate today = LocalDate.now(java.time.ZoneId.of("Asia/Seoul"));
+        if (routine.isActive()) {
+            // 오늘 이미 했으면 오늘은 남기고 내일부터 쉰다
+            boolean doneToday = routineRecordRepository
+                    .findByRoutine_RoutineIdAndRecordDate(routineId, today)
+                    .isPresent();
+            routine.pause(doneToday ? today.plusDays(1) : today);
+        } else {
+            routine.resume(today);
+        }
         return routineRepository.save(routine);
     }
 
     // 루틴 삭제
+    // 지난 기록(통계)은 남기고, 기준 날짜부터 달력에서 사라지도록 종료일만 정한다.
+    // - 기준 날짜에 아직 안 했으면: 그 날부터 사라짐
+    // - 기준 날짜에 이미 했으면: 그 날은 남기고 다음 날부터 사라짐
     @Transactional
-    public void deleteRoutine(Integer routineId, Integer userId) {
+    public void deleteRoutine(Integer routineId, Integer userId, LocalDate baseDate) {
         Routine routine = routineRepository.findByRoutineIdAndUser_UserId(routineId, userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 루틴이 존재하지 않습니다."));
 
-        routineRecordRepository.deleteByRoutine_RoutineId(routineId);
-        routineRepository.delete(routine);
+        LocalDate base = (baseDate != null) ? baseDate : LocalDate.now();
+        boolean doneOnBase = routineRecordRepository
+                .findByRoutine_RoutineIdAndRecordDate(routineId, base)
+                .isPresent();
+
+        routine.setEndDate(doneOnBase ? base.plusDays(1) : base);
+        routineRepository.save(routine);
     }
 }

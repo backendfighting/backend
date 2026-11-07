@@ -32,6 +32,10 @@ public class RoutineController {
         routine.setDescription(request.getDescription());
         routine.setCategory(request.getCategory());
         routine.setRepeatDays(request.getRepeatDays());
+        routine.setStartDate(request.getStartDate());
+        routine.setRoutineTime(request.getRoutineTime());
+        routine.setPriority(request.getPriority());
+        routine.setNotifyBefore(request.getNotifyBefore());
         return new RoutineResponseDto(routineService.createRoutine(userId, routine));
     }
 
@@ -78,6 +82,10 @@ public class RoutineController {
         routineDetails.setDescription(request.getDescription());
         routineDetails.setCategory(request.getCategory());
         routineDetails.setRepeatDays(request.getRepeatDays());
+        routineDetails.setStartDate(request.getStartDate());
+        routineDetails.setRoutineTime(request.getRoutineTime());
+        routineDetails.setPriority(request.getPriority());
+        routineDetails.setNotifyBefore(request.getNotifyBefore());
         return new RoutineResponseDto(routineService.updateRoutine(routineId, userId, routineDetails));
     }
 
@@ -90,10 +98,13 @@ public class RoutineController {
         return new RoutineResponseDto(routineService.toggleRoutineActive(routineId, userId));
     }
 
-    // 루틴 삭제
+    // 루틴 삭제 (지난 기록은 남기고, date부터 달력에서 사라지게 함. date를 안 보내면 오늘 기준)
+    @Operation(summary = "루틴 삭제", description = "기준 날짜(date)에 아직 안 했으면 그 날부터, 이미 했으면 다음 날부터 달력에서 사라짐. 지난 달성 기록은 통계용으로 유지")
     @DeleteMapping("/{routineId}")
-    public void deleteRoutine(@PathVariable("routineId") Integer routineId, HttpServletRequest request) {
+    public void deleteRoutine(@PathVariable("routineId") Integer routineId,
+            @RequestParam(value = "date", required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) LocalDate date,
+            HttpServletRequest request) {
         Integer userId = (Integer) request.getAttribute("userId");
-        routineService.deleteRoutine(routineId, userId);
+        routineService.deleteRoutine(routineId, userId, date);
     }
 }
