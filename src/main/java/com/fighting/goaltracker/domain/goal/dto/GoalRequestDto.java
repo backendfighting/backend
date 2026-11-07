@@ -13,4 +13,5 @@ public class GoalRequestDto {
     private LocalDate startDate;
     private LocalDate endDate;
     private Integer progress;
+    private Boolean remindOn; // 마감일 리마인더 알림 (보내지 않으면 기존 값 유지)
 }

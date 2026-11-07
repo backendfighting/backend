@@ -17,6 +17,7 @@ public class GoalResponseDto {
     private Integer progress;
     private String status;
     private String reason;
+    private boolean remindOn;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -30,6 +31,7 @@ public class GoalResponseDto {
         this.progress = goal.getProgress();
         this.status = goal.getStatus();
         this.reason = goal.getReason();
+        this.remindOn = Boolean.TRUE.equals(goal.getRemindOn());
         this.createdAt = goal.getCreatedAt();
         this.updatedAt = goal.getUpdatedAt();
     }

@@ -38,6 +38,10 @@ public class Goal {
     private String status = "진행중";
     private String reason;
 
+    // 마감일에 리마인더 알림을 받을지 (비어 있으면 받지 않음)
+    @Column(name = "remind_on")
+    private Boolean remindOn;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
@@ -47,7 +51,7 @@ public class Goal {
     private LocalDateTime updatedAt;
 
     public void update(String title, String category, String description,
-            LocalDate startDate, LocalDate endDate, Integer progress) {
+            LocalDate startDate, LocalDate endDate) {
         if (title != null)
             this.title = title;
         if (category != null)
@@ -58,7 +62,5 @@ public class Goal {
             this.startDate = startDate;
         if (endDate != null)
             this.endDate = endDate;
-        if (progress != null)
-            this.progress = progress;
     }
 }
