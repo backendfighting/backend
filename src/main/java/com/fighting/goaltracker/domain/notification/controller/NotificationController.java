@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "알림(Notification)", description = "알림 조회 및 읽음 처리")
+@Tag(name = "알림(Notification)", description = "알림 조회, 읽음 처리, 삭제")
 @RestController
 @RequestMapping("/api/notifications")
 public class NotificationController {
@@ -33,5 +33,14 @@ public class NotificationController {
         Integer userId = (Integer) request.getAttribute("userId");
         notificationService.markAsRead(id, userId);
         return "읽음 처리되었습니다.";
+    }
+
+    // 알림 삭제
+    @Operation(summary = "알림 삭제", description = "특정 알림을 삭제")
+    @DeleteMapping("/{id}")
+    public String deleteNotification(@PathVariable("id") Integer id, HttpServletRequest request) {
+        Integer userId = (Integer) request.getAttribute("userId");
+        notificationService.deleteNotification(id, userId);
+        return "삭제되었습니다.";
     }
 }
