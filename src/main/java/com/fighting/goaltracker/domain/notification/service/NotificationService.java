@@ -72,7 +72,7 @@ public class NotificationService {
 
             // 1) 할 일 (자정 직후 일정은 전날 밤에 울릴 수 있으므로 내일 일정도 확인)
             for (LocalDate day : List.of(today, tomorrow)) {
-                for (Todo todo : todoRepository.findByUser_UserIdAndTodoDateAndCompletedFalse(userId, day)) {
+                for (Todo todo : todoRepository.findByUser_UserIdAndTodoDateAndIsCompletedFalse(userId, day)) {
                     if (todo.getTodoTime() == null || todo.getNotifyBefore() == null)
                         continue;
                     LocalDateTime alarmAt = day.atTime(todo.getTodoTime()).minusMinutes(todo.getNotifyBefore());
@@ -105,7 +105,7 @@ public class NotificationService {
 
             // 3) 오늘의 미션
             if (user.missionAlarmEnabled() && user.alarmTimeList().contains(nowHm)) {
-                int remain = todoRepository.findByUser_UserIdAndTodoDateAndCompletedFalse(userId, today).size();
+                int remain = todoRepository.findByUser_UserIdAndTodoDateAndIsCompletedFalse(userId, today).size();
                 for (Routine routine : routineRepository.findActiveRoutinesByDay(userId, today.getDayOfWeek())) {
                     if (!routine.appearsOn(today))
                         continue;

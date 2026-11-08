@@ -17,7 +17,7 @@ public interface TodoRepository extends JpaRepository<Todo, Integer> {
 
     void deleteByUser_UserId(Integer userId);
 
-    List<Todo> findByUser_UserIdAndTodoDateAndCompletedFalse(Integer userId, LocalDate todoDate);
+    List<Todo> findByUser_UserIdAndTodoDateAndIsCompletedFalse(Integer userId, LocalDate todoDate);
 
     Optional<Todo> findByTodoIdAndUser_UserId(Integer todoId, Integer userId);
 
