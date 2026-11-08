@@ -9,6 +9,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -45,6 +46,14 @@ public class UserService {
     // 회원가입
     @Transactional
     public User signup(User user) {
+        if (user.getName() == null || user.getName().isBlank()) {
+            throw new IllegalArgumentException("닉네임을 입력해주세요.");
+        }
+        if (user.getEmail() == null || !user.getEmail().matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")) {
+            throw new IllegalArgumentException("이메일 형식이 올바르지 않습니다.");
+        }
+        validatePassword(user.getPassword());
+
         // 중복 이메일 확인
         userRepository.findByEmail(user.getEmail())
                 .ifPresent(m -> {
@@ -54,6 +63,16 @@ public class UserService {
         // 비밀번호 암호화 후 저장
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
+    }
+
+    // 비밀번호 규칙: 8자 이상, BCrypt가 처리할 수 있는 72바이트 이하
+    private void validatePassword(String password) {
+        if (password == null || password.length() < 8) {
+            throw new IllegalArgumentException("비밀번호는 8자 이상이어야 합니다.");
+        }
+        if (password.getBytes(StandardCharsets.UTF_8).length > 72) {
+            throw new IllegalArgumentException("비밀번호가 너무 깁니다.");
+        }
     }
 
     // 사용자 조회 (ID로 찾기)
@@ -110,6 +129,8 @@ public class UserService {
         if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
             throw new IllegalArgumentException("현재 비밀번호가 일치하지 않습니다.");
         }
+
+        validatePassword(newPassword);
 
         // 새 비밀번호 암호화 후 저장
         user.setPassword(passwordEncoder.encode(newPassword));
