@@ -9,7 +9,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "routine_records")
+// 같은 루틴을 같은 날짜에 두 번 기록하지 못하게 막는다 (빠른 연속 클릭 대비)
+@Table(name = "routine_records", uniqueConstraints = @UniqueConstraint(name = "uk_routine_record_date", columnNames = { "routine_id", "record_date" }))
 @Getter
 @Setter
 public class RoutineRecord {
